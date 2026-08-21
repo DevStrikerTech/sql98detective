@@ -98,6 +98,9 @@ export function CaseFilesApp({ onRequest }: { onRequest: (what: string) => void 
               {id === "evidence" && unread > 0 && tab !== "evidence" && (
                 <span className="anim-blink ml-1 font-bold text-destructive">NEW</span>
               )}
+              {id === "suspects" && brokenCount > 0 && tab !== "suspects" && (
+                <span className="anim-blink ml-1 font-bold text-destructive">!</span>
+              )}
             </button>
           ))}
         </div>
