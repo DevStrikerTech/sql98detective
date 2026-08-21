@@ -3,13 +3,7 @@ import { cn } from "@/lib/utils";
 import { Win98Icon } from "../Win98Icon";
 import { Win98Button } from "../Win98Button";
 import { emails, type Mail } from "@/content/emails";
-import {
-  CASE_ID,
-  caseEmail,
-  caseFollowUps,
-  mailActions,
-  mailRoomChatter,
-} from "@/content/case001";
+import { CASE_ID, caseEmail, caseFollowUps, mailActions, mailRoomChatter } from "@/content/case001";
 import { useGameStore } from "@/lib/game/gameStore";
 import { useShellStore } from "@/lib/game/shellStore";
 import { useWindowStore } from "@/lib/win98/windowStore";
@@ -51,10 +45,7 @@ export function InboxApp() {
   /* The mail room mutters to itself between deliveries. */
   const [chatter, setChatter] = useState(0);
   useEffect(() => {
-    const id = window.setInterval(
-      () => setChatter((c) => (c + 1) % mailRoomChatter.length),
-      11000,
-    );
+    const id = window.setInterval(() => setChatter((c) => (c + 1) % mailRoomChatter.length), 11000);
     return () => window.clearInterval(id);
   }, []);
 
