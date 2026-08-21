@@ -150,9 +150,12 @@ export function SqlExeApp() {
   };
 
   const clear = () => {
+    timers.current.forEach((t) => clearTimeout(t));
+    timers.current = [];
     setQuery("");
     setResult(null);
     setRevealStep(0);
+    setRunning(false);
     setLines([...BOOT_LINES, "", "READY."]);
     setStatus("READY");
   };
