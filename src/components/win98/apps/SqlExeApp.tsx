@@ -217,9 +217,9 @@ export function SqlExeApp() {
         {result?.correct && revealStep > 0 && (
           <div className="mt-3 border-t border-terminal-ink/40 pt-2">
             {[
-              "Interesting.",
-              "Kevin said he never touched payroll.xls.",
-              "The logs disagree. 09:21:04 — DELETE.",
+              "1 row returned. Interesting.",
+              "Kevin, on record: \"I never touched payroll.xls. Not once.\"",
+              "The log, on record: 09:21:04 — DELETE — kevin — payroll.xls.",
               ">>> ONE NAME MATCHES. ONE NAME LIED. <<<",
             ]
               .slice(0, revealStep)
@@ -236,6 +236,7 @@ export function SqlExeApp() {
               ))}
           </div>
         )}
+
 
         {!running && (
           <div className="mt-2">
