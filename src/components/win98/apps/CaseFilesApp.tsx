@@ -126,10 +126,10 @@ export function CaseFilesApp({ onRequest }: { onRequest: (what: string) => void 
 
                 <Section label="SUMMARY">
                   <p className="text-[11px] leading-[1.6] text-ink">
-                    payroll.xls left C:\OFFICE\DOCUMENTS at 09:21 and did not come back. Three people
-                    were logged onto the office machine that morning. All three have an account of
-                    their movements. Only one of those accounts has to survive contact with the
-                    access log.
+                    payroll.xls left C:\OFFICE\DOCUMENTS at 09:21 and did not come back. Three
+                    people were logged onto the office machine that morning. All three have an
+                    account of their movements. Only one of those accounts has to survive contact
+                    with the access log.
                   </p>
                 </Section>
 

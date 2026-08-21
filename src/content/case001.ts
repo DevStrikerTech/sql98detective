@@ -438,10 +438,7 @@ export const mailActions: { label: string; title: string; message: string }[] = 
  * Handwritten follow-up the detective scribbles on the folder margin once an
  * exhibit is filed. Narrative only — never names the culprit before SQL does.
  */
-export const clueNotes: Record<
-  ClueId,
-  { filedAt: string; note: string; lead: string }
-> = {
+export const clueNotes: Record<ClueId, { filedAt: string; note: string; lead: string }> = {
   "payroll-missing": {
     filedAt: "09:52",
     note: "Gone, not moved. Nobody drags a file into thin air by accident.",
