@@ -344,3 +344,22 @@
   );
   animation: win98-marquee 500ms steps(4, end) infinite;
 }
+
+@keyframes win98-stamp {
+  0% {
+    transform: rotate(-11deg) scale(2.6);
+    opacity: 0;
+  }
+  60% {
+    transform: rotate(-11deg) scale(0.94);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(-11deg) scale(1);
+    opacity: 1;
+  }
+}
+
+@utility anim-stamp {
+  animation: win98-stamp 260ms steps(5, end);
+}

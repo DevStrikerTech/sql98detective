@@ -1,31 +1,51 @@
 import { create } from "zustand";
 import type { AppId } from "@/lib/win98/windowStore";
+import type { ClueId } from "@/content/case001";
 
-export type GamePhase = "idle" | "investigating" | "solved";
+export type GamePhase = "idle" | "offered" | "investigating" | "revealed" | "solved";
 
 export type GameStore = {
   phase: GamePhase;
   currentCaseId: string | null;
-  discoveredClues: string[];
+  discoveredClues: ClueId[];
   completedObjectives: string[];
   unlockedApps: AppId[];
+  sqlUnlocked: boolean;
+  hintsUsed: number;
+  startedAt: number | null;
+  finishedAt: number | null;
 
+  offerCase: (caseId: string) => void;
   startCase: (caseId: string) => void;
-  discoverClue: (clueId: string) => void;
+  discoverClue: (clueId: ClueId) => boolean;
   completeObjective: (objectiveId: string) => void;
   unlockApp: (app: AppId) => void;
+  unlockSql: () => void;
+  useHint: () => void;
+  revealCulprit: () => void;
   solveCase: () => void;
   reset: () => void;
 };
 
 const DEFAULT_APPS: AppId[] = ["my-computer", "inbox", "case-files", "sql-exe", "recycle-bin"];
 
-export const useGameStore = create<GameStore>((set) => ({
-  phase: "idle",
+const INITIAL = {
+  phase: "idle" as GamePhase,
   currentCaseId: null,
-  discoveredClues: [],
-  completedObjectives: [],
+  discoveredClues: [] as ClueId[],
+  completedObjectives: [] as string[],
   unlockedApps: DEFAULT_APPS,
+  sqlUnlocked: false,
+  hintsUsed: 0,
+  startedAt: null,
+  finishedAt: null,
+};
+
+export const useGameStore = create<GameStore>((set, get) => ({
+  ...INITIAL,
+
+  offerCase: (caseId) =>
+    set((s) => (s.phase === "idle" ? { phase: "offered", currentCaseId: caseId } : s)),
 
   startCase: (caseId) =>
     set({
@@ -33,14 +53,14 @@ export const useGameStore = create<GameStore>((set) => ({
       currentCaseId: caseId,
       discoveredClues: [],
       completedObjectives: [],
+      startedAt: Date.now(),
     }),
 
-  discoverClue: (clueId) =>
-    set((s) => ({
-      discoveredClues: s.discoveredClues.includes(clueId)
-        ? s.discoveredClues
-        : [...s.discoveredClues, clueId],
-    })),
+  discoverClue: (clueId) => {
+    if (get().discoveredClues.includes(clueId)) return false;
+    set((s) => ({ discoveredClues: [...s.discoveredClues, clueId] }));
+    return true;
+  },
 
   completeObjective: (objectiveId) =>
     set((s) => ({
@@ -54,14 +74,13 @@ export const useGameStore = create<GameStore>((set) => ({
       unlockedApps: s.unlockedApps.includes(app) ? s.unlockedApps : [...s.unlockedApps, app],
     })),
 
-  solveCase: () => set({ phase: "solved" }),
+  unlockSql: () => set({ sqlUnlocked: true }),
 
-  reset: () =>
-    set({
-      phase: "idle",
-      currentCaseId: null,
-      discoveredClues: [],
-      completedObjectives: [],
-      unlockedApps: DEFAULT_APPS,
-    }),
+  useHint: () => set((s) => ({ hintsUsed: s.hintsUsed + 1 })),
+
+  revealCulprit: () => set((s) => (s.phase === "investigating" ? { phase: "revealed" } : s)),
+
+  solveCase: () => set({ phase: "solved", finishedAt: Date.now() }),
+
+  reset: () => set({ ...INITIAL }),
 }));

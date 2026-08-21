@@ -1,23 +1,134 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 import { Win98Button } from "../Win98Button";
+import { Win98Icon } from "../Win98Icon";
+import { hints, runQuery, type SqlOutcome } from "@/lib/game/sqlEngine";
+import { useGameStore } from "@/lib/game/gameStore";
+import { useShellStore } from "@/lib/game/shellStore";
+
+const BOOT_LINES = [
+  "SQL/98 Interactive Query Console v0.9b",
+  "(c) 1998 Precinct Data Systems. All rights probably reserved.",
+];
 
 export function SqlExeApp() {
-  const [query, setQuery] = useState("SELECT * FROM suspects WHERE alibi IS NULL;");
+  const phase = useGameStore((s) => s.phase);
+  const sqlUnlocked = useGameStore((s) => s.sqlUnlocked);
+  const hintsUsed = useGameStore((s) => s.hintsUsed);
+  const useHint = useGameStore((s) => s.useHint);
+  const revealCulprit = useGameStore((s) => s.revealCulprit);
+  const solveCase = useGameStore((s) => s.solveCase);
+  const say = useShellStore((s) => s.say);
+  const playCue = useShellStore((s) => s.playCue);
+
+  const [query, setQuery] = useState("SELECT username\nFROM file_access_logs\nWHERE ");
+  const [lines, setLines] = useState<string[]>([...BOOT_LINES, "", "READY."]);
+  const [running, setRunning] = useState(false);
+  const [status, setStatus] = useState("READY");
+  const [result, setResult] = useState<SqlOutcome | null>(null);
+  const outRef = useRef<HTMLDivElement>(null);
+  const timers = useRef<number[]>([]);
+
+  useEffect(
+    () => () => {
+      timers.current.forEach((t) => clearTimeout(t));
+    },
+    [],
+  );
+
+  useEffect(() => {
+    outRef.current?.scrollTo({ top: outRef.current.scrollHeight });
+  }, [lines, result]);
+
+  if (!sqlUnlocked) {
+    return (
+      <div className="win98-in flex min-h-0 flex-1 flex-col items-center justify-center gap-3 bg-terminal p-6 text-center font-mono text-terminal-ink">
+        <Win98Icon name="sql-exe" size={40} />
+        <div className="text-[14px] font-bold tracking-widest">QUERY ENGINE LOCKED</div>
+        <p className="max-w-[320px] text-[12px] leading-[1.6] opacity-80">
+          Collect enough evidence before interrogating the records.
+        </p>
+        <div className="text-[12px] opacity-60">
+          {phase === "idle" || phase === "offered"
+            ? "No active investigation."
+            : "Hint: the machine keeps logs. C:\\OFFICE\\LOGS\\"}
+        </div>
+        <div className="mt-2 text-[12px]">
+          {"C:\\PRECINCT>"} <span className="anim-blink">_</span>
+        </div>
+      </div>
+    );
+  }
+
+  const push = (s: string) => setLines((l) => [...l, s]);
+
+  const execute = () => {
+    if (running) return;
+    playCue("query");
+    setRunning(true);
+    setResult(null);
+    setStatus("EXECUTING QUERY...");
+    setLines([]);
+    const steps = ["CONNECTING TO EVIDENCE.MDB . . .", "SEARCHING RECORDS . . .", "FILTERING . . ."];
+    timers.current.forEach((t) => clearTimeout(t));
+    timers.current = [];
+    steps.forEach((s, i) => {
+      timers.current.push(window.setTimeout(() => push(s), 300 + i * 380));
+    });
+    timers.current.push(
+      window.setTimeout(() => {
+        const outcome = runQuery(query);
+        setResult(outcome);
+        setRunning(false);
+        setStatus(outcome.statusText);
+        push(outcome.status === "error" ? `** ${outcome.statusText} **` : outcome.statusText);
+        if (outcome.message) push(outcome.message);
+        if (outcome.quip) say(outcome.quip);
+        if (outcome.correct) {
+          revealCulprit();
+          playCue("evidence");
+        } else {
+          playCue("error");
+        }
+      }, 300 + steps.length * 380 + 420),
+    );
+  };
+
+  const clear = () => {
+    setQuery("");
+    setResult(null);
+    setLines([...BOOT_LINES, "", "READY."]);
+    setStatus("READY");
+  };
+
+  const nextHint = () => {
+    const idx = Math.min(hintsUsed, hints.length - 1);
+    useHint();
+    push(`HINT ${idx + 1}: ${hints[idx]!}`);
+    setStatus(`HINT ${idx + 1} OF ${hints.length}`);
+  };
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-[3px]">
-      <div className="win98-in win98-scroll min-h-0 flex-1 overflow-auto bg-terminal p-2 font-mono text-[12px] leading-[1.45] text-terminal-ink">
-        <div>SQL/98 Interactive Query Console v0.9b</div>
-        <div>(c) 1998 Precinct Data Systems. All rights probably reserved.</div>
-        <div className="mt-2">Connecting to EVIDENCE.MDB . . . . . . . . . [ OK ]</div>
-        <div>Loading suspect index . . . . . . . . . . . [ OK ]</div>
-        <div>Verifying detective badge . . . . . . . . . [ PENDING ]</div>
-        <div className="mt-2 opacity-80">
-          Query engine is OFFLINE. Execution is disabled until a case is assigned.
-        </div>
-        <div className="mt-2">
-          {"C:\\PRECINCT>"} <span className="anim-blink">_</span>
-        </div>
+      {/* toolbar */}
+      <div className="win98-out flex shrink-0 items-center gap-1 bg-surface px-1 py-[2px]">
+        <Win98Button className="min-w-0 px-2" onClick={execute} disabled={running}>
+          ▶ Execute
+        </Win98Button>
+        <Win98Button className="min-w-0 px-2" onClick={clear} disabled={running}>
+          Clear
+        </Win98Button>
+        <div className="mx-1 h-[16px] w-[2px] border-l border-surface-shadow border-r border-r-surface-hilite" />
+        <Win98Button className="min-w-0 px-2" onClick={nextHint} disabled={running}>
+          Hint
+        </Win98Button>
+        <span className="ml-auto pr-1 text-[11px] text-ink-disabled">
+          Table: file_access_logs
+        </span>
+      </div>
+
+      <div className="win98-groove shrink-0 bg-surface px-2 py-1 text-[11px]">
+        <b>INVESTIGATION QUERY:</b> Find the user who deleted payroll.xls.
       </div>
 
       <div className="shrink-0">
@@ -26,17 +137,86 @@ export function SqlExeApp() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           spellCheck={false}
-          className="win98-field win98-scroll h-[56px] w-full resize-none p-[3px] font-mono text-[12px] text-ink outline-none"
+          className="win98-field win98-scroll h-[54px] w-full resize-none p-[3px] font-mono text-[12px] text-ink outline-none"
+          style={running ? { cursor: "wait" } : undefined}
         />
-        <div className="mt-[4px] flex items-center gap-2">
-          <Win98Button disabled title="Requires an active investigation">
-            Execute
-          </Win98Button>
-          <Win98Button disabled>Explain</Win98Button>
-          <span className="text-[11px] text-ink-disabled">
-            Execute disabled — no active investigation.
-          </span>
+      </div>
+
+      <div
+        ref={outRef}
+        className="win98-in win98-scroll min-h-0 flex-1 overflow-auto bg-terminal p-2 font-mono text-[12px] leading-[1.45] text-terminal-ink"
+        style={running ? { cursor: "wait" } : undefined}
+      >
+        {lines.map((l, i) => (
+          <div key={i}>{l}</div>
+        ))}
+
+        {running && (
+          <div className="mt-1">
+            <span className="win98-marquee-bar inline-block h-[10px] w-[120px] align-middle" />
+          </div>
+        )}
+
+        {result && result.status === "rows" && result.rows.length > 0 && (
+          <table className="anim-redraw mt-2 border-collapse">
+            <thead>
+              <tr>
+                {result.columns.map((c) => (
+                  <th key={c} className="border border-terminal-ink/50 px-2 text-left">
+                    {c}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {result.rows.map((r, i) => (
+                <tr key={i}>
+                  {r.map((cell, j) => (
+                    <td key={j} className="border border-terminal-ink/50 px-2">
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+
+        {result?.correct && (
+          <div className="mt-3 border-t border-terminal-ink/40 pt-2">
+            <div className="anim-flicker">Interesting.</div>
+            <div>Kevin said he never touched payroll.xls.</div>
+            <div>The logs disagree.</div>
+          </div>
+        )}
+
+        {!running && (
+          <div className="mt-2">
+            {"C:\\PRECINCT>"} <span className="anim-blink">_</span>
+          </div>
+        )}
+      </div>
+
+      <div className="flex shrink-0 items-center gap-2">
+        <div
+          className={cn(
+            "win98-in flex-1 truncate px-[5px] py-[2px] text-[11px]",
+            running ? "text-ink anim-blink" : "text-ink",
+          )}
+        >
+          {status}
         </div>
+        {result?.correct && phase !== "solved" && (
+          <Win98Button
+            className="font-bold"
+            onClick={() => {
+              solveCase();
+              playCue("solved");
+            }}
+          >
+            ACCUSE KEVIN
+          </Win98Button>
+        )}
       </div>
     </div>
   );

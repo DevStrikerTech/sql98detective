@@ -4,13 +4,19 @@ import { DesktopWindow } from "./DesktopWindow";
 import { Taskbar } from "./Taskbar";
 import { StartMenu } from "./StartMenu";
 import { Win98Dialog } from "./Win98Dialog";
+import { Assistant } from "./Assistant";
+import { CaseClosed } from "./CaseClosed";
 import { MyComputerApp } from "./apps/MyComputerApp";
 import { InboxApp } from "./apps/InboxApp";
 import { CaseFilesApp } from "./apps/CaseFilesApp";
 import { SqlExeApp } from "./apps/SqlExeApp";
+import { LogViewerApp } from "./apps/LogViewerApp";
 import { RecycleBinApp } from "./apps/RecycleBinApp";
 import { AboutApp } from "./apps/AboutApp";
 import { useWindowStore, useActiveWindowId, type AppId, type WindowState } from "@/lib/win98/windowStore";
+import { useGameStore } from "@/lib/game/gameStore";
+import { useShellStore } from "@/lib/game/shellStore";
+import { CASE_ID, clues } from "@/content/case001";
 import type { IconName } from "./Win98Icon";
 
 const desktopIcons: { app: AppId; label: string; icon: IconName }[] = [
@@ -26,15 +32,8 @@ const menusFor: Partial<Record<AppId, string[]>> = {
   inbox: ["File", "Edit", "Compose", "Help"],
   "case-files": ["File", "View", "Help"],
   "sql-exe": ["File", "Query", "Options", "Help"],
+  "log-viewer": ["File", "View", "Help"],
   "recycle-bin": ["File", "Edit", "View", "Help"],
-};
-
-const statusFor: Partial<Record<AppId, string>> = {
-  "my-computer": "7 object(s)",
-  inbox: "5 message(s), 3 unread",
-  "case-files": "No case assigned",
-  "sql-exe": "Query engine offline",
-  "recycle-bin": "5 object(s)  1.20 MB",
 };
 
 export function Desktop() {
@@ -48,11 +47,23 @@ export function Desktop() {
   const toggleFromTaskbar = useWindowStore((s) => s.toggleFromTaskbar);
   const activeId = useActiveWindowId();
 
+  const phase = useGameStore((s) => s.phase);
+  const offerCase = useGameStore((s) => s.offerCase);
+  const discovered = useGameStore((s) => s.discoveredClues);
+  const sqlUnlocked = useGameStore((s) => s.sqlUnlocked);
+
+  const dialog = useShellStore((s) => s.dialog);
+  const showDialog = useShellStore((s) => s.showDialog);
+  const closeDialog = useShellStore((s) => s.closeDialog);
+  const flashApp = useShellStore((s) => s.flashApp);
+  const setFlashApp = useShellStore((s) => s.setFlashApp);
+  const playCue = useShellStore((s) => s.playCue);
+
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
   const [startOpen, setStartOpen] = useState(false);
   const [flashingId, setFlashingId] = useState<string | null>(null);
-  const [dialog, setDialog] = useState<{ title: string; message: string } | null>(null);
   const [frozen, setFrozen] = useState(false);
+  const [reportDismissed, setReportDismissed] = useState(false);
 
   const openApp = useCallback(
     (app: AppId) => {
@@ -70,16 +81,62 @@ export function Desktop() {
     return () => clearTimeout(t);
   }, [windows.length]);
 
+  /* Stage 1 — the quiet desktop, then an incoming message. */
+  useEffect(() => {
+    if (phase !== "idle") return;
+    const t = setTimeout(() => {
+      offerCase(CASE_ID);
+      setFlashApp("inbox");
+      playCue("message");
+      showDialog({
+        title: "New Message Received",
+        message:
+          "From: Chief Brannigan\nSubject: URGENT!!! payroll.xls IS GONE\n\nOpen the Inbox to read it.",
+        icon: "mail",
+        okLabel: "OK",
+      });
+    }, 4200);
+    return () => clearTimeout(t);
+  }, [phase, offerCase, setFlashApp, playCue, showDialog]);
+
+  /* Clear icon flashing after a few blinks. */
+  useEffect(() => {
+    if (!flashApp) return;
+    const t = setTimeout(() => setFlashApp(null), 4000);
+    return () => clearTimeout(t);
+  }, [flashApp, setFlashApp]);
+
   const notImplemented = (what: string) => {
     setFrozen(true);
     setStartOpen(false);
     setTimeout(() => {
       setFrozen(false);
-      setDialog({
+      showDialog({
         title: `${what} - Error`,
         message: `${what} is not available in this build.\n\nThe responsible module is still on a floppy disk somewhere in the evidence locker.`,
       });
     }, 700);
+  };
+
+  const statusFor = (app: AppId): string | undefined => {
+    switch (app) {
+      case "my-computer":
+        return "Double-click to open";
+      case "inbox":
+        return phase === "idle" ? "5 message(s), 3 unread" : "6 message(s), 1 urgent";
+      case "case-files":
+        return phase === "idle" || phase === "offered"
+          ? "No case assigned"
+          : `CASE ${CASE_ID} — ${discovered.length}/${clues.length} clues`;
+      case "sql-exe":
+        return sqlUnlocked ? "Query engine online" : "Query engine locked";
+      case "log-viewer":
+        return "6 record(s)";
+      case "recycle-bin":
+        return "5 object(s)  1.20 MB";
+      default:
+        return undefined;
+    }
   };
 
   return (
@@ -95,14 +152,15 @@ export function Desktop() {
     >
       <div className="absolute top-2 left-2 flex flex-col gap-1">
         {desktopIcons.map((d) => (
-          <DesktopIcon
-            key={d.app}
-            label={d.label}
-            icon={d.icon}
-            selected={selectedIcon === d.app}
-            onSelect={() => setSelectedIcon(d.app)}
-            onOpen={() => openApp(d.app)}
-          />
+          <div key={d.app} className={flashApp === d.app ? "anim-flash" : undefined}>
+            <DesktopIcon
+              label={d.label}
+              icon={d.icon}
+              selected={selectedIcon === d.app}
+              onSelect={() => setSelectedIcon(d.app)}
+              onOpen={() => openApp(d.app)}
+            />
+          </div>
         ))}
       </div>
 
@@ -113,7 +171,7 @@ export function Desktop() {
             win={win}
             active={win.id === activeId}
             menus={menusFor[win.app]}
-            statusText={statusFor[win.app]}
+            statusText={statusFor(win.app)}
             onFocus={focus}
             onClose={close}
             onMinimize={minimize}
@@ -129,7 +187,7 @@ export function Desktop() {
         <StartMenu
           onOpenApp={openApp}
           onShutdown={() =>
-            setDialog({
+            showDialog({
               title: "Shut Down Windows",
               message:
                 "It is now safe to keep investigating.\n\n(Shutting down has been disabled by your Chief.)",
@@ -149,12 +207,29 @@ export function Desktop() {
         onTaskClick={toggleFromTaskbar}
       />
 
+      <Assistant />
+
       {dialog && (
         <Win98Dialog
           title={dialog.title}
+          icon={dialog.icon ?? "warning"}
           message={<span className="whitespace-pre-wrap">{dialog.message}</span>}
-          onClose={() => setDialog(null)}
+          buttons={[
+            {
+              label: dialog.okLabel ?? "OK",
+              onClick: () => {
+                const cb = dialog.onOk;
+                closeDialog();
+                cb?.();
+              },
+            },
+          ]}
+          onClose={closeDialog}
         />
+      )}
+
+      {phase === "solved" && !reportDismissed && (
+        <CaseClosed onDismiss={() => setReportDismissed(true)} />
       )}
     </div>
   );
@@ -170,9 +245,13 @@ function renderApp(win: WindowState, notImplemented: (what: string) => void) {
       return <CaseFilesApp onRequest={notImplemented} />;
     case "sql-exe":
       return <SqlExeApp />;
+    case "log-viewer":
+      return <LogViewerApp />;
     case "recycle-bin":
       return <RecycleBinApp />;
     case "about":
       return <AboutApp />;
+    default:
+      return null;
   }
 }
