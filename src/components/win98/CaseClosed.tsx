@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Win98Button } from "./Win98Button";
 import { TitleBar } from "./TitleBar";
-import { CASE_ID, CASE_TITLE } from "@/content/case001";
+import { CASE_ID, CASE_TITLE, caseEpilogue } from "@/content/case001";
 import { useGameStore } from "@/lib/game/gameStore";
 import { useShellStore } from "@/lib/game/shellStore";
 
@@ -13,8 +13,9 @@ export function CaseClosed({ onDismiss }: { onDismiss: () => void }) {
   const finishedAt = useGameStore((s) => s.finishedAt);
   const playCue = useShellStore((s) => s.playCue);
   const say = useShellStore((s) => s.say);
-  const [stage, setStage] = useState<0 | 1 | 2>(0);
+  const [stage, setStage] = useState<0 | 1 | 2 | 3>(0);
   const [rows, setRows] = useState(0);
+  const [epi, setEpi] = useState(0);
 
   const elapsed =
     startedAt && finishedAt ? Math.max(1, Math.round((finishedAt - startedAt) / 1000)) : null;
@@ -46,16 +47,26 @@ export function CaseClosed({ onDismiss }: { onDismiss: () => void }) {
         ),
       );
     });
+    const stampAt = 750 + report.length * 190;
     timers.push(
-      window.setTimeout(
-        () => {
-          setStage(2);
-          playCue("solved");
-          say("Case closed. Try not to look smug on the way out.");
-        },
-        750 + report.length * 190,
-      ),
+      window.setTimeout(() => {
+        setStage(2);
+        playCue("solved");
+        say("Case closed. Try not to look smug on the way out.");
+      }, stampAt),
     );
+    timers.push(window.setTimeout(() => setStage(3), stampAt + 1500));
+    caseEpilogue.forEach((_, i) => {
+      timers.push(
+        window.setTimeout(
+          () => {
+            setEpi(i + 1);
+            playCue("query");
+          },
+          stampAt + 1650 + i * 260,
+        ),
+      );
+    });
     return () => timers.forEach(clearTimeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -68,7 +79,7 @@ export function CaseClosed({ onDismiss }: { onDismiss: () => void }) {
     <div className="win98-scanlines absolute inset-0 z-[9500] flex items-center justify-center bg-desktop/80">
       <div className="win98-out anim-snap-open relative w-[420px] bg-surface p-[3px]">
         <TitleBar title="Case Report - CASE 001" icon="case-files" active onClose={onDismiss} />
-        <div className="anim-redraw win98-field m-[3px] p-4">
+        <div className="relative anim-redraw win98-field m-[3px] p-4">
           <div className="text-[11px] tracking-[0.2em] text-ink-disabled">
             PRECINCT DATA SYSTEMS — CASE {CASE_ID}
           </div>
@@ -94,10 +105,36 @@ export function CaseClosed({ onDismiss }: { onDismiss: () => void }) {
             </div>
           )}
         </div>
+
+        {stage === 3 && (
+          <div className="win98-groove anim-snap-open mx-[3px] mb-2 flex items-start gap-2 bg-surface p-2">
+            <div className="min-w-0 flex-1">
+              <div className="mb-1 text-[11px] tracking-[0.2em] text-ink-disabled">
+                AFTER THE MORNING
+              </div>
+              {caseEpilogue.slice(0, epi).map((line) => (
+                <div
+                  key={line}
+                  className="anim-typeout py-[1px] text-[11px] leading-[1.45] text-ink"
+                >
+                  — {line}
+                </div>
+              ))}
+            </div>
+            <div
+              className="anim-stamp mt-3 mr-1 shrink-0 border-[3px] border-destructive px-2 py-[2px] text-[13px] leading-none font-bold tracking-[0.14em] text-destructive opacity-80"
+              style={{ transform: "rotate(-11deg)" }}
+            >
+              CASE CLOSED
+            </div>
+          </div>
+        )}
+
+
         <div className="flex justify-center gap-2 pb-3">
           <Win98Button
             onClick={onDismiss}
-            className={cn("font-bold", stage === 2 && "anim-pulse-border")}
+            className={cn("font-bold", stage >= 2 && "anim-pulse-border")}
           >
             RETURN TO DESKTOP
           </Win98Button>

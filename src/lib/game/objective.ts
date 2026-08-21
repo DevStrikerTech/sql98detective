@@ -10,38 +10,50 @@ export function currentObjective(args: {
 }): Objective {
   const { phase, discoveredCount, sqlUnlocked } = args;
   if (phase === "idle")
-    return { code: "STANDBY", text: "No active case. Drink the cold coffee.", where: "Desktop" };
+    return {
+      code: "STANDBY",
+      text: "No active case. The coffee is cold and so is the trail.",
+      where: "Desktop",
+    };
   if (phase === "offered")
     return {
       code: "OBJ-00",
-      text: "Read the Chief's message and accept the case.",
+      text: "The Chief is standing near your desk. Read the message. Take the case.",
       where: "Inbox",
     };
   if (phase === "solved")
-    return { code: "CLOSED", text: "Case closed. File the paperwork.", where: "Case Files" };
+    return {
+      code: "CLOSED",
+      text: "Case closed. File it before the Chief invents another one.",
+      where: "Case Files",
+    };
   if (phase === "revealed")
-    return { code: "OBJ-04", text: "Name your suspect. Accuse them.", where: "SQL.exe" };
+    return {
+      code: "OBJ-04",
+      text: "You have the name. Say it out loud, on the record.",
+      where: "SQL.exe",
+    };
   if (sqlUnlocked)
     return {
       code: "OBJ-03",
-      text: "Interrogate file_access_logs for the DELETE on payroll.xls.",
+      text: "Ask the records who deleted payroll.xls. Politely, in SQL.",
       where: "SQL.exe",
     };
   if (discoveredCount === 0)
     return {
       code: "OBJ-01",
-      text: "Search the office computer for evidence.",
+      text: "Start where the file was. C:\\OFFICE\\DOCUMENTS.",
       where: "My Computer",
     };
   if (discoveredCount === 1)
     return {
       code: "OBJ-02",
-      text: "Pull the file access records in C:\\OFFICE\\LOGS\\.",
+      text: "The machine wrote the morning down. Find C:\\OFFICE\\LOGS\\.",
       where: "My Computer",
     };
   return {
     code: "OBJ-02B",
-    text: "Read every record. Someone signed their name to a DELETE.",
+    text: "Read every record. Somebody signed their name to something.",
     where: "Log Viewer",
   };
 }
