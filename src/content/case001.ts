@@ -11,6 +11,13 @@ export type Suspect = {
   name: string;
   role: string;
   statement: string;
+  /** Where they sit — the precinct is a real place with real bad carpet. */
+  desk: string;
+  alibi: string;
+  /** Small human detail the detective would notice. */
+  tell: string;
+  /** If this clue is discovered, the statement above stops holding up. */
+  contradictedBy?: ClueId;
 };
 
 export const suspects: Suspect[] = [
@@ -19,20 +26,31 @@ export const suspects: Suspect[] = [
     name: "Linda",
     role: "Accounting",
     statement: '"I opened payroll.xls to review it. That is all. I alphabetise my staplers."',
+    desk: "Desk 4 — by the fern nobody waters",
+    alibi: "Signed out of the file at 09:15. Was queueing for the good printer by 09:17.",
+    tell: "Keeps a laminated copy of the coffee rota. Laminated.",
   },
   {
     id: "kevin",
     name: "Kevin",
     role: "Junior IT",
     statement: '"I never touched payroll.xls. Not once. Why would I. I wouldn\'t."',
+    desk: "Desk 9 — under the server fan, permanently cold",
+    alibi: "Claims he was 'reimaging a machine'. Cannot say which machine.",
+    tell: "Said 'never' three times in one sentence. Nobody needs three.",
+    contradictedBy: "kevin-timing",
   },
   {
     id: "gary",
     name: "Gary",
     role: "Office troublemaker",
     statement: '"I don\'t even know what a spreadsheet is. Is it a kind of jam?"',
+    desk: "Desk 12 — visible from the vending machine, deliberately",
+    alibi: "Downloading a 8MB MP3 at 09:20. On this connection, that is an ironclad alibi.",
+    tell: "Guilty of everything except, annoyingly, this.",
   },
 ];
+
 
 export type ClueId = "payroll-missing" | "access-logs" | "kevin-timing";
 
