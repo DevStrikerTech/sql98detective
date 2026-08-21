@@ -1,6 +1,6 @@
 # SQL 98: Digital Detective
 
-![app demo](https://github.com/DevStrikerTech/sql98detective/blob/main/public/short_demo.gif?raw=true)
+![app demo](https://github.com/DevStrikerTech/sql98detective/blob/main/public/audio/demo.gif?raw=true)
 
 Boot the machine, read your precinct inbox, open case files, inspect suspicious logs and use SQL.exe to turn messy office gossip into proof. The goal is to feel like an investigation game first and an SQL-learning toy second: SQL is the detective tool, not the whole personality.
 
