@@ -54,14 +54,17 @@ export function SqlExeApp() {
     setLines([...BOOT_LINES, ""]);
     warrantScript.forEach((l, i) => {
       timers.current.push(
-        window.setTimeout(() => {
-          setLines((prev) => [...prev, l]);
-          if (l) playCue("query");
-          if (i === warrantScript.length - 1) {
-            setLines((prev) => [...prev, "", "READY."]);
-            setStatus("WARRANT ACTIVE — AWAITING QUERY");
-          }
-        }, 260 + i * 340),
+        window.setTimeout(
+          () => {
+            setLines((prev) => [...prev, l]);
+            if (l) playCue("query");
+            if (i === warrantScript.length - 1) {
+              setLines((prev) => [...prev, "", "READY."]);
+              setStatus("WARRANT ACTIVE — AWAITING QUERY");
+            }
+          },
+          260 + i * 340,
+        ),
       );
     });
   }, [sqlUnlocked, playCue]);

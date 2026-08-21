@@ -45,7 +45,7 @@ const menusFor: Partial<Record<AppId, string[]>> = {
   "recycle-bin": ["File", "Edit", "View", "Help"],
 };
 
-const FIRST_RUN_GUIDE_KEY = "sql98-first-run-guide-v1";
+const FIRST_RUN_GUIDE_KEY = "sql98-first-run-guide-v3";
 const INTRO_THEME_PATH = "/audio/intro-theme.mp3";
 
 export function Desktop() {
@@ -75,6 +75,9 @@ export function Desktop() {
   const [frozen, setFrozen] = useState(false);
   const [reportDismissed, setReportDismissed] = useState(false);
   const [showFirstRunGuide, setShowFirstRunGuide] = useState(false);
+  const [briefingStep, setBriefingStep] = useState(-1);
+  const [introMusicPlaying, setIntroMusicPlaying] = useState(false);
+  const [introMusicError, setIntroMusicError] = useState(false);
   const introAudioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -91,6 +94,7 @@ export function Desktop() {
         audio.pause();
         audio.currentTime = 0;
       }
+      setIntroMusicPlaying(false);
       return;
     }
 
@@ -99,19 +103,10 @@ export function Desktop() {
     audio.loop = true;
     audio.volume = 0.45;
 
-    const startAudio = () => {
-      void audio.play().catch(() => {
-        /* autoplay is best-effort only */
-      });
-    };
-
-    startAudio();
-    window.addEventListener("pointerdown", startAudio, { once: true });
-
     return () => {
-      window.removeEventListener("pointerdown", startAudio);
       audio.pause();
       audio.currentTime = 0;
+      setIntroMusicPlaying(false);
     };
   }, [showFirstRunGuide, muted]);
 
@@ -129,9 +124,32 @@ export function Desktop() {
     }
     introAudioRef.current?.pause();
     if (introAudioRef.current) introAudioRef.current.currentTime = 0;
+    setIntroMusicPlaying(false);
     setShowFirstRunGuide(false);
     if (phase === "offered") open("inbox");
   }, [open, phase]);
+
+  const startBriefing = useCallback(() => {
+    const audio = introAudioRef.current;
+    setBriefingStep(0);
+    setIntroMusicError(false);
+    if (!audio || muted) return;
+    audio.currentTime = 0;
+    void audio
+      .play()
+      .then(() => {
+        setIntroMusicPlaying(true);
+        setIntroMusicError(false);
+      })
+      .catch(() => {
+        setIntroMusicPlaying(false);
+        setIntroMusicError(true);
+      });
+  }, [muted]);
+
+  const nextBriefingStep = useCallback(() => {
+    setBriefingStep((s) => s + 1);
+  }, []);
 
   const newestWindowId = windows[windows.length - 1]?.id ?? null;
   useEffect(() => {
@@ -232,7 +250,16 @@ export function Desktop() {
       <EvidenceToast />
       <ScreenFxLayer />
       <Assistant />
-      {showFirstRunGuide && <FirstRunGuide onBegin={beginFromGuide} />}
+      {showFirstRunGuide && (
+        <FirstRunGuide
+          step={briefingStep}
+          musicPlaying={introMusicPlaying}
+          musicError={introMusicError}
+          onStartBriefing={startBriefing}
+          onNext={nextBriefingStep}
+          onBegin={beginFromGuide}
+        />
+      )}
 
       {dialog && (
         <Win98Dialog
