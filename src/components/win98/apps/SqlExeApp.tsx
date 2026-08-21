@@ -100,7 +100,8 @@ export function SqlExeApp() {
             playCue("evidence");
             fireScreenFx("flicker");
             // Let the accusation land one beat at a time.
-            [700, 1500, 2300, 3100].forEach((ms, i) => {
+            [800, 1750, 2700, 3700].forEach((ms, i) => {
+
               timers.current.push(
                 window.setTimeout(() => {
                   setRevealStep(i + 1);
