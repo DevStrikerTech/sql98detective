@@ -335,6 +335,22 @@
   animation: win98-blink 1s steps(1, end) infinite;
 }
 
+/* A slow, patient bob — QUERY.hlp thinking about it. */
+@keyframes win98-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@utility anim-blink-slow {
+  animation: win98-bob 2.4s steps(2, end) infinite;
+  display: inline-block;
+}
+
 @utility win98-marquee-bar {
   background-image: repeating-linear-gradient(
     90deg,

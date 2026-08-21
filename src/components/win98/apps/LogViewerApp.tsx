@@ -19,6 +19,8 @@ import { useWindowStore } from "@/lib/win98/windowStore";
 export function LogViewerApp() {
   const [sel, setSel] = useState<number | null>(null);
   const [examined, setExamined] = useState<number[]>([]);
+  /** A WHERE clause with a mouse. Same idea the player will type later. */
+  const [payrollOnly, setPayrollOnly] = useState(false);
   const phase = useGameStore((s) => s.phase);
   const discoverClue = useGameStore((s) => s.discoverClue);
   const sqlUnlocked = useGameStore((s) => s.sqlUnlocked);
@@ -33,6 +35,7 @@ export function LogViewerApp() {
   const openWindow = useWindowStore((s) => s.open);
   const investigating = phase !== "idle" && phase !== "offered";
 
+  const rows = payrollOnly ? accessLogs.filter((r) => r.file === "payroll.xls") : accessLogs;
   const selRow = accessLogs.find((r) => r.id === sel) ?? null;
   const selSuspect = selRow ? suspects.find((s) => s.id === selRow.user) : undefined;
 
@@ -121,9 +124,27 @@ export function LogViewerApp() {
         </div>
         <div className="flex justify-between text-[11px] text-ink-disabled">
           <span>09:10</span>
+          <span>one tick = one record. Click to pull it.</span>
           <span>09:25</span>
         </div>
       </div>
+
+      {/* A WHERE clause you can click. Same instinct, fewer semicolons. */}
+      <label className="win98-groove flex shrink-0 cursor-default items-center gap-2 bg-surface px-2 py-1 text-[11px] text-ink">
+        <input
+          type="checkbox"
+          checked={payrollOnly}
+          onChange={(e) => {
+            setPayrollOnly(e.target.checked);
+            playCue("query");
+          }}
+        />
+        Show only records for <span className="font-mono">payroll.xls</span>
+        <span className="ml-auto text-ink-disabled">
+          {payrollOnly ? `filtered — ${rows.length} of ${accessLogs.length}` : "unfiltered"}
+        </span>
+      </label>
+
       <div className="win98-field win98-scroll min-h-0 flex-1 overflow-auto">
         <table className="w-full border-collapse text-[11px]">
           <thead>
@@ -139,7 +160,7 @@ export function LogViewerApp() {
             </tr>
           </thead>
           <tbody className="font-mono">
-            {accessLogs.map((r) => (
+            {rows.map((r) => (
               <tr
                 key={r.id}
                 onClick={() => inspectRow(r)}

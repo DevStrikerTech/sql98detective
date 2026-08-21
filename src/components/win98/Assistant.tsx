@@ -33,12 +33,17 @@ export function Assistant() {
   lineRef.current = line;
   useEffect(() => {
     if (phase === "idle" || phase === "offered" || phase === "solved") return;
+    // Shuffled once, so QUERY never repeats itself twice in a row.
+    const order = assistantBarks
+      .map((t, i) => ({ t, k: (i * 7919 + Date.now()) % 1000 }))
+      .sort((a, b) => a.k - b.k)
+      .map((x) => x.t);
     let n = 0;
     const id = window.setInterval(() => {
-      if (lineRef.current) return;
-      say(assistantBarks[n % assistantBarks.length]!);
+      if (lineRef.current || document.hidden) return;
+      say(order[n % order.length]!);
       n += 1;
-    }, 42000);
+    }, 36000);
     return () => window.clearInterval(id);
   }, [phase, say]);
 
@@ -60,11 +65,16 @@ export function Assistant() {
           </button>
         </div>
         <div className="flex gap-2 p-2">
-          <Win98Icon name="sql-exe" size={24} />
+          <span className="anim-blink-slow shrink-0">
+            <Win98Icon name="sql-exe" size={24} />
+          </span>
           <p className="min-h-[42px] flex-1 text-[11px] leading-[1.45] text-ink">
             {typed}
             <span className="anim-blink">_</span>
           </p>
+        </div>
+        <div className="win98-in mx-[3px] mb-[3px] truncate px-[4px] py-[1px] text-[11px] text-ink-disabled">
+          QUERY.hlp — unhelpful since 1997
         </div>
       </div>
     </div>

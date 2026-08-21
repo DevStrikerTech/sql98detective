@@ -3,7 +3,13 @@ import { cn } from "@/lib/utils";
 import { Win98Icon } from "../Win98Icon";
 import { Win98Button } from "../Win98Button";
 import { emails, type Mail } from "@/content/emails";
-import { CASE_ID, caseEmail, caseFollowUps } from "@/content/case001";
+import {
+  CASE_ID,
+  caseEmail,
+  caseFollowUps,
+  mailActions,
+  mailRoomChatter,
+} from "@/content/case001";
 import { useGameStore } from "@/lib/game/gameStore";
 import { useShellStore } from "@/lib/game/shellStore";
 import { useWindowStore } from "@/lib/win98/windowStore";
@@ -42,6 +48,29 @@ export function InboxApp() {
     setRead((r) => (r.includes(selectedId) ? r : [...r, selectedId]));
   }, [selectedId]);
 
+  /* The mail room mutters to itself between deliveries. */
+  const [chatter, setChatter] = useState(0);
+  useEffect(() => {
+    const id = window.setInterval(
+      () => setChatter((c) => (c + 1) % mailRoomChatter.length),
+      11000,
+    );
+    return () => window.clearInterval(id);
+  }, []);
+
+  /* Anything that lands while the window is open gets a brief NEW flag. */
+  const [seen, setSeen] = useState<string[]>(() => list.map((m) => m.id));
+  const [fresh, setFresh] = useState<string[]>([]);
+  useEffect(() => {
+    const arrivals = list.map((m) => m.id).filter((id) => !seen.includes(id));
+    if (arrivals.length === 0) return;
+    setSeen((s) => [...s, ...arrivals]);
+    setFresh(arrivals);
+    playCue("message");
+    const t = window.setTimeout(() => setFresh([]), 6000);
+    return () => window.clearTimeout(t);
+  }, [list, seen, playCue]);
+
   const mail = list.find((m) => m.id === selectedId) ?? list[0]!;
   const isCaseMail = mail.id === caseEmail.id;
   const unreadCount = list.filter((m) => !read.includes(m.id)).length;
@@ -74,11 +103,30 @@ export function InboxApp() {
         </span>
       </div>
 
+      {/* A toolbar of buttons that all, in their own way, refuse. */}
+      <div className="flex shrink-0 flex-wrap items-center gap-[3px]">
+        {mailActions.map((a) => (
+          <Win98Button
+            key={a.label}
+            className="px-2"
+            onClick={() => {
+              playCue("error");
+              showDialog({ title: a.title, message: a.message, icon: "warning" });
+            }}
+          >
+            {a.label}
+          </Win98Button>
+        ))}
+        <span className="ml-auto pr-1 text-[11px] text-ink-disabled">
+          Mailbox: DETECTIVE (shared)
+        </span>
+      </div>
+
       <div className="win98-field win98-scroll h-[120px] overflow-auto">
         <table className="w-full border-collapse text-[11px]">
           <thead>
             <tr>
-              {["From", "Subject", "Received"].map((h) => (
+              {["!", "From", "Subject", "Received"].map((h) => (
                 <th
                   key={h}
                   className="win98-out sticky top-0 bg-surface px-[4px] py-[2px] text-left font-normal"
@@ -101,6 +149,9 @@ export function InboxApp() {
                     m.id === selectedId ? "bg-select text-select-ink" : "text-ink",
                   )}
                 >
+                  <td className="w-[14px] px-[3px] py-[1px] text-center font-bold">
+                    {urgent ? <span className="anim-blink">!</span> : ""}
+                  </td>
                   <td className="px-[4px] py-[1px] whitespace-nowrap">
                     <span
                       className={cn(
@@ -115,6 +166,11 @@ export function InboxApp() {
                     </span>
                   </td>
                   <td className={cn("px-[4px] py-[1px]", (urgent || unread) && "font-bold")}>
+                    {fresh.includes(m.id) && (
+                      <span className="anim-stamp mr-1 border border-destructive px-[2px] text-[9px] font-bold tracking-[0.1em] text-destructive">
+                        NEW
+                      </span>
+                    )}
                     {m.subject}
                   </td>
                   <td className="px-[4px] py-[1px] whitespace-nowrap">{m.date}</td>
@@ -163,7 +219,7 @@ export function InboxApp() {
 
       <div className="win98-in shrink-0 truncate px-[5px] py-[2px] text-[11px] text-ink-disabled">
         {list.length} message(s), {unreadCount} unread
-        {phase === "offered" ? " — the Chief is waiting." : ""}
+        {phase === "offered" ? " — the Chief is waiting." : ` — ${mailRoomChatter[chatter]}`}
       </div>
     </div>
   );

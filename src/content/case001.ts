@@ -395,3 +395,41 @@ export const assistantBarks: string[] = [
   "Somewhere in this building a fax machine is dialling nobody.",
   "The Chief has walked past your desk again. Slowly.",
 ];
+
+/** Status-bar mutterings for the precinct mail system. Flavour, not logic. */
+export const mailRoomChatter: string[] = [
+  "Mail server: awake. Barely.",
+  "Delivery queue: 1 pending, 1 sulking.",
+  "Reminder: the Chief reads receipts.",
+  "Attachment scanning is performed by Kevin, manually.",
+  "Outgoing post collected at 11:00, or thereabouts.",
+  "This terminal is not authorised to send mail. It never was.",
+];
+
+/** Canned replies the mail client refuses to send. Pure comedy. */
+export const mailActions: { label: string; title: string; message: string }[] = [
+  {
+    label: "Reply",
+    title: "Cannot Send Mail",
+    message:
+      "Outgoing mail is disabled on detective terminals.\n\nThe Chief prefers to be told things in person, loudly.",
+  },
+  {
+    label: "Forward",
+    title: "Cannot Forward Mail",
+    message:
+      "Forwarding requires a second mailbox.\n\nThe precinct has one mailbox. We share it. It is not going well.",
+  },
+  {
+    label: "Delete",
+    title: "Access Denied",
+    message:
+      "Deleting evidence is, in this specific building, considered ironic.\n\nRequest logged.",
+  },
+  {
+    label: "Print",
+    title: "Printer Error",
+    message:
+      "PRN1: paper jam.\nPRN2: is the good printer, and is lying about being the good printer.\n\nNo pages were harmed.",
+  },
+];
