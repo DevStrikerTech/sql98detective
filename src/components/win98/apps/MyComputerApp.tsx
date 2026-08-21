@@ -172,7 +172,10 @@ export function MyComputerApp() {
 
       <div className="flex shrink-0 items-center gap-2">
         <div className="win98-in flex-1 truncate px-[5px] py-[2px] text-[11px] text-ink-disabled">
-          {selected ? selected.detail : `${items.length} object(s)`}
+          {selected
+            ? selected.detail
+            : `${items.length} object(s) — ${precinctChatter[chatter]}`}
+
         </div>
         <Win98Button disabled={!selected} onClick={() => selected && openNode(selected)}>
           Open
