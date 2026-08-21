@@ -133,14 +133,22 @@ export function CaseClosed({ onDismiss }: { onDismiss: () => void }) {
           </div>
         )}
 
-        <div className="flex justify-center gap-2 pb-3">
+        <div className="flex flex-col items-center gap-1 pb-3">
           <Win98Button
             onClick={onDismiss}
             className={cn("font-bold", stage >= 2 && "anim-pulse-border")}
           >
-            RETURN TO DESKTOP
+            {reportDone ? "RETURN TO DESKTOP" : "STAND DOWN"}
           </Win98Button>
+          <span className="text-[11px] tracking-[0.1em] text-ink-disabled">
+            {stage >= 3
+              ? "Report filed. Chief Brannigan has been notified, loudly."
+              : reportDone
+                ? "Signing the report . . ."
+                : "Stenographer is still typing."}
+          </span>
         </div>
+
       </div>
     </div>
   );
