@@ -153,7 +153,7 @@ export function MyComputerApp() {
             >
               {clueForNode(d) && discoveredClues.includes(clueForNode(d)!) && (
                 <span
-                  className="anim-stamp pointer-events-none absolute top-[4px] right-[2px] border border-destructive px-[2px] text-[9px] leading-[1.2] font-bold tracking-[0.1em] text-destructive"
+                  className="anim-stamp pointer-events-none absolute top-[2px] right-[1px] z-10 border border-destructive bg-field px-[2px] text-[9px] leading-[1.2] font-bold tracking-[0.1em] whitespace-nowrap text-destructive"
                   style={{ transform: "rotate(-9deg)" }}
                 >
                   LOGGED
