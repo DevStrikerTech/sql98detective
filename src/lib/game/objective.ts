@@ -25,9 +25,15 @@ export function currentObjective(args: {
     };
   if (discoveredCount === 0)
     return { code: "OBJ-01", text: "Search the office computer for evidence.", where: "My Computer" };
+  if (discoveredCount === 1)
+    return {
+      code: "OBJ-02",
+      text: "Pull the file access records in C:\\OFFICE\\LOGS\\.",
+      where: "My Computer",
+    };
   return {
-    code: "OBJ-02",
-    text: "Pull the file access records in C:\\OFFICE\\LOGS\\.",
-    where: "My Computer",
+    code: "OBJ-02B",
+    text: "Read every record. Someone signed their name to a DELETE.",
+    where: "Log Viewer",
   };
 }

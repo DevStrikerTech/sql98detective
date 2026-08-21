@@ -38,7 +38,7 @@ export function EvidenceToast() {
             </div>
           </div>
 
-          <div className="mt-2 flex items-center gap-2">
+          <div className="mt-2 flex items-center gap-2 pr-[46px]">
             <span className="text-[11px] tracking-[0.1em] text-ink-disabled">CLUES</span>
             <div className="win98-in h-[10px] flex-1 bg-field p-[1px]">
               <div
