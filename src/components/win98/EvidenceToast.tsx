@@ -19,7 +19,10 @@ export function EvidenceToast() {
   if (!evidence) return null;
 
   return (
-    <div key={evidence.id} className="pointer-events-none absolute top-3 right-3 z-[8800] w-[268px]">
+    <div
+      key={evidence.id}
+      className="pointer-events-none absolute top-3 right-3 z-[8800] w-[268px]"
+    >
       <div className="win98-out anim-snap-open relative bg-surface p-[3px]">
         <div className="win98-titlebar-active flex items-center gap-1 px-[3px] py-[2px]">
           <Win98Icon name="case-files" size={12} />

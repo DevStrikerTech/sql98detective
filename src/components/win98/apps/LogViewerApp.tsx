@@ -91,11 +91,6 @@ export function LogViewerApp() {
                 className={cn(
                   "cursor-default hover:bg-surface-hilite",
                   sel === r.id ? "bg-select text-select-ink" : "text-ink",
-                  investigating &&
-                    r.user === "kevin" &&
-                    r.file === "payroll.xls" &&
-                    sel !== r.id &&
-                    "font-bold",
                 )}
               >
                 <td className="px-[4px] py-[1px]">{r.id}</td>

@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useGameStore } from "./gameStore";
 import { useShellStore } from "./shellStore";
 import { CASE_ID, clues } from "@/content/case001";
-import type { AppId } from "@/lib/win98/windowStore";
+import { useWindowStore, type AppId } from "@/lib/win98/windowStore";
 
 export function useCaseFlow() {
   const phase = useGameStore((s) => s.phase);
@@ -15,6 +15,7 @@ export function useCaseFlow() {
   const playCue = useShellStore((s) => s.playCue);
   const fireScreenFx = useShellStore((s) => s.fireScreenFx);
   const say = useShellStore((s) => s.say);
+  const openWindow = useWindowStore((s) => s.open);
 
   useEffect(() => {
     if (phase !== "idle") return;
@@ -37,12 +38,13 @@ export function useCaseFlow() {
             "INCOMING PRIORITY TRANSMISSION — 09:47\n\nFrom: Chief Brannigan\nSubject: URGENT!!! payroll.xls IS GONE\n\nThe Chief is typing in all caps. That is never good.\nOpen the Inbox.",
           icon: "mail",
           okLabel: "OPEN INBOX",
+          onOk: () => openWindow("inbox"),
         });
         say("Priority message. Somebody upstairs is already sweating.");
       }, 4200),
     );
     return () => timers.forEach(clearTimeout);
-  }, [phase, offerCase, setFlashApp, playCue, showDialog, fireScreenFx, say]);
+  }, [phase, offerCase, setFlashApp, playCue, showDialog, fireScreenFx, say, openWindow]);
 
   const statusFor = (app: AppId): string | undefined => {
     switch (app) {

@@ -12,7 +12,11 @@ export function currentObjective(args: {
   if (phase === "idle")
     return { code: "STANDBY", text: "No active case. Drink the cold coffee.", where: "Desktop" };
   if (phase === "offered")
-    return { code: "OBJ-00", text: "Read the Chief's message and accept the case.", where: "Inbox" };
+    return {
+      code: "OBJ-00",
+      text: "Read the Chief's message and accept the case.",
+      where: "Inbox",
+    };
   if (phase === "solved")
     return { code: "CLOSED", text: "Case closed. File the paperwork.", where: "Case Files" };
   if (phase === "revealed")
@@ -24,7 +28,11 @@ export function currentObjective(args: {
       where: "SQL.exe",
     };
   if (discoveredCount === 0)
-    return { code: "OBJ-01", text: "Search the office computer for evidence.", where: "My Computer" };
+    return {
+      code: "OBJ-01",
+      text: "Search the office computer for evidence.",
+      where: "My Computer",
+    };
   if (discoveredCount === 1)
     return {
       code: "OBJ-02",

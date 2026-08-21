@@ -200,7 +200,8 @@ export function SqlExeApp() {
                       key={j}
                       className={cn(
                         "border border-terminal-ink/50 px-2",
-                        result.correct && String(cell).toLowerCase() === "kevin" &&
+                        result.correct &&
+                          String(cell).toLowerCase() === "kevin" &&
                           "anim-blink font-bold",
                       )}
                     >
