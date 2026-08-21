@@ -54,8 +54,8 @@ export function useCaseFlow() {
         return phase === "idle" ? "5 message(s), 3 unread" : "6 message(s), 1 urgent";
       case "case-files":
         return phase === "idle" || phase === "offered"
-          ? "No case assigned"
-          : `CASE ${CASE_ID} — ${discovered.length}/${clues.length} clues`;
+          ? "No case assigned  ·  folder empty"
+          : `CASE ${CASE_ID} — ${discovered.length}/${clues.length} exhibits filed`;
       case "sql-exe":
         return sqlUnlocked ? "Query engine online" : "Query engine locked";
       case "log-viewer":
