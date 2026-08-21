@@ -1,0 +1,15 @@
+export const bootLines = [
+  "Precinct BIOS v4.51PG  (C) 1998 Data Systems Inc.",
+  "",
+  "CPU: Pentium(R) 133 MHz .......... OK",
+  "Memory Test: 32768K ............... OK",
+  "Detecting IDE Primary Master ..... PRECINCT-C",
+  "Detecting IDE Secondary Master ... EVIDENCE-CD",
+  "Detecting Floppy Drive A: ........ OK",
+  "",
+  "Mounting EVIDENCE.MDB ............ OK",
+  "Loading detective profile ........ OK",
+  "Coffee subsystem ................. COLD",
+  "",
+  "Starting SQL 98 . . .",
+];

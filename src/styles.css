@@ -1,0 +1,346 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * SQL 98: Digital Detective — authentic Windows 98 design system.
+ * All chrome colors live here as semantic tokens. Components must never
+ * hardcode colors; use bg-surface / text-ink / .win98-out etc.
+ */
+
+@theme inline {
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Windows 98 chrome */
+  --color-surface: var(--w98-face);
+  --color-surface-light: var(--w98-light);
+  --color-surface-hilite: var(--w98-hilite);
+  --color-surface-shadow: var(--w98-shadow);
+  --color-surface-dark: var(--w98-dark);
+  --color-ink: var(--w98-ink);
+  --color-ink-disabled: var(--w98-ink-disabled);
+  --color-title: var(--w98-title);
+  --color-title-2: var(--w98-title-2);
+  --color-title-inactive: var(--w98-title-inactive);
+  --color-title-ink: var(--w98-title-ink);
+  --color-field: var(--w98-field);
+  --color-desktop: var(--w98-desktop);
+  --color-select: var(--w98-select);
+  --color-select-ink: var(--w98-select-ink);
+  --color-terminal: var(--w98-terminal);
+  --color-terminal-ink: var(--w98-terminal-ink);
+  --color-boot: var(--w98-boot);
+
+  --font-ui: "MS Sans Serif", "Pixelated MS Sans Serif", Tahoma, Geneva, Verdana, sans-serif;
+  --font-mono: "Consolas", "Lucida Console", "Courier New", monospace;
+}
+
+:root {
+  --radius: 0px;
+
+  /* Win98 palette */
+  --w98-face: oklch(0.8367 0 0);
+  --w98-light: oklch(0.9067 0 0);
+  --w98-hilite: oklch(1 0 0);
+  --w98-shadow: oklch(0.5771 0 0);
+  --w98-dark: oklch(0 0 0);
+  --w98-ink: oklch(0 0 0);
+  --w98-ink-disabled: oklch(0.5771 0 0);
+  --w98-title: oklch(0.3113 0.1099 264.05);
+  --w98-title-2: oklch(0.5163 0.145 264.05);
+  --w98-title-inactive: oklch(0.5771 0 0);
+  --w98-title-ink: oklch(1 0 0);
+  --w98-field: oklch(1 0 0);
+  --w98-desktop: oklch(0.4665 0.0553 190.5);
+  --w98-select: oklch(0.3113 0.1099 264.05);
+  --w98-select-ink: oklch(1 0 0);
+  --w98-terminal: oklch(0.145 0 0);
+  --w98-terminal-ink: oklch(0.8664 0.2028 143.5);
+  --w98-boot: oklch(0.13 0 0);
+
+  /* shadcn compatibility mapped onto the 98 palette */
+  --background: var(--w98-face);
+  --foreground: var(--w98-ink);
+  --card: var(--w98-face);
+  --card-foreground: var(--w98-ink);
+  --popover: var(--w98-face);
+  --popover-foreground: var(--w98-ink);
+  --primary: var(--w98-title);
+  --primary-foreground: var(--w98-title-ink);
+  --secondary: var(--w98-face);
+  --secondary-foreground: var(--w98-ink);
+  --muted: var(--w98-light);
+  --muted-foreground: var(--w98-ink-disabled);
+  --accent: var(--w98-select);
+  --accent-foreground: var(--w98-select-ink);
+  --destructive: oklch(0.51 0.2 27);
+  --destructive-foreground: oklch(1 0 0);
+  --border: var(--w98-shadow);
+  --input: var(--w98-field);
+  --ring: var(--w98-title);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    background-color: var(--color-desktop);
+    color: var(--color-ink);
+    font-family: var(--font-ui);
+    font-size: 11px;
+    line-height: 1.25;
+    -webkit-font-smoothing: none;
+    font-smooth: never;
+    cursor: default;
+    user-select: none;
+  }
+
+  ::selection {
+    background: var(--color-select);
+    color: var(--color-select-ink);
+  }
+}
+
+/* ---------- Beveled edges (the heart of the 98 look) ---------- */
+
+@utility win98-out {
+  border-style: solid;
+  border-width: 2px;
+  border-top-color: var(--color-surface-hilite);
+  border-left-color: var(--color-surface-hilite);
+  border-right-color: var(--color-surface-dark);
+  border-bottom-color: var(--color-surface-dark);
+  box-shadow:
+    inset 1px 1px 0 0 var(--color-surface-light),
+    inset -1px -1px 0 0 var(--color-surface-shadow);
+}
+
+@utility win98-in {
+  border-style: solid;
+  border-width: 2px;
+  border-top-color: var(--color-surface-shadow);
+  border-left-color: var(--color-surface-shadow);
+  border-right-color: var(--color-surface-hilite);
+  border-bottom-color: var(--color-surface-hilite);
+  box-shadow:
+    inset 1px 1px 0 0 var(--color-surface-dark),
+    inset -1px -1px 0 0 var(--color-surface-light);
+}
+
+@utility win98-field {
+  border-style: solid;
+  border-width: 2px;
+  border-top-color: var(--color-surface-shadow);
+  border-left-color: var(--color-surface-shadow);
+  border-right-color: var(--color-surface-hilite);
+  border-bottom-color: var(--color-surface-hilite);
+  background-color: var(--color-field);
+  box-shadow: inset 1px 1px 0 0 var(--color-surface-dark);
+}
+
+@utility win98-groove {
+  border: 1px solid var(--color-surface-shadow);
+  border-right-color: var(--color-surface-hilite);
+  border-bottom-color: var(--color-surface-hilite);
+}
+
+@utility win98-focus-dots {
+  outline: 1px dotted var(--color-ink);
+  outline-offset: -4px;
+}
+
+/* ---------- Desktop wallpaper ---------- */
+
+@utility win98-wallpaper {
+  background-color: var(--color-desktop);
+  background-image:
+    radial-gradient(
+      circle at 1px 1px,
+      color-mix(in oklab, var(--color-surface-hilite) 8%, transparent) 1px,
+      transparent 0
+    );
+  background-size: 4px 4px;
+}
+
+@utility win98-titlebar-active {
+  background: linear-gradient(90deg, var(--color-title) 0%, var(--color-title-2) 100%);
+}
+
+@utility win98-titlebar-inactive {
+  background: linear-gradient(
+    90deg,
+    var(--color-title-inactive) 0%,
+    color-mix(in oklab, var(--color-title-inactive) 60%, var(--color-surface-light)) 100%
+  );
+}
+
+/* ---------- Chunky scrollbars ---------- */
+
+@utility win98-scroll {
+  scrollbar-width: auto;
+
+  &::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: var(--color-surface-light);
+    background-image: repeating-conic-gradient(
+      var(--color-surface-hilite) 0% 25%,
+      var(--color-surface) 0% 50%
+    );
+    background-size: 2px 2px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--color-surface);
+    border: 2px solid;
+    border-top-color: var(--color-surface-hilite);
+    border-left-color: var(--color-surface-hilite);
+    border-right-color: var(--color-surface-dark);
+    border-bottom-color: var(--color-surface-dark);
+  }
+  &::-webkit-scrollbar-corner {
+    background-color: var(--color-surface);
+  }
+}
+
+/* ---------- Retro animations ---------- */
+
+@keyframes win98-snap-open {
+  0% {
+    transform: scale(0.82, 0.06);
+    opacity: 0.4;
+  }
+  55% {
+    transform: scale(1.01, 1.03);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1, 1);
+    opacity: 1;
+  }
+}
+
+@keyframes win98-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  35% {
+    opacity: 0.55;
+  }
+  40% {
+    opacity: 1;
+  }
+  62% {
+    opacity: 0.35;
+  }
+  66% {
+    opacity: 1;
+  }
+}
+
+@keyframes win98-flash {
+  0%,
+  100% {
+    filter: none;
+  }
+  50% {
+    filter: invert(1);
+  }
+}
+
+@keyframes win98-redraw {
+  0% {
+    clip-path: inset(0 0 100% 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes win98-marquee {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 32px 0;
+  }
+}
+
+@keyframes win98-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@utility anim-snap-open {
+  animation: win98-snap-open 130ms steps(4, end);
+  transform-origin: center center;
+}
+
+@utility anim-flicker {
+  animation: win98-flicker 220ms steps(1, end);
+}
+
+@utility anim-flash {
+  animation: win98-flash 180ms steps(1, end) 3;
+}
+
+@utility anim-redraw {
+  animation: win98-redraw 200ms steps(8, end);
+}
+
+@utility anim-blink {
+  animation: win98-blink 1s steps(1, end) infinite;
+}
+
+@utility win98-marquee-bar {
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--color-title) 0 12px,
+    transparent 12px 32px
+  );
+  animation: win98-marquee 500ms steps(4, end) infinite;
+}
