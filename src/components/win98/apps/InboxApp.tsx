@@ -149,6 +149,9 @@ export function InboxApp() {
                     m.id === selectedId ? "bg-select text-select-ink" : "text-ink",
                   )}
                 >
+                  <td className="w-[14px] px-[3px] py-[1px] text-center font-bold">
+                    {urgent ? <span className="anim-blink">!</span> : ""}
+                  </td>
                   <td className="px-[4px] py-[1px] whitespace-nowrap">
                     <span
                       className={cn(
@@ -163,6 +166,11 @@ export function InboxApp() {
                     </span>
                   </td>
                   <td className={cn("px-[4px] py-[1px]", (urgent || unread) && "font-bold")}>
+                    {fresh.includes(m.id) && (
+                      <span className="anim-stamp mr-1 border border-destructive px-[2px] text-[9px] font-bold tracking-[0.1em] text-destructive">
+                        NEW
+                      </span>
+                    )}
                     {m.subject}
                   </td>
                   <td className="px-[4px] py-[1px] whitespace-nowrap">{m.date}</td>
