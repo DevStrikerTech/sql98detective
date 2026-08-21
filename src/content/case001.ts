@@ -537,10 +537,22 @@ export const proofBrief: { heading: string; line: string }[] = [
 export const caseConfig: CaseConfig = {
   id: CASE_ID,
   title: CASE_TITLE,
+  summary:
+    "payroll.xls left C:\\OFFICE\\DOCUMENTS at 09:21 and did not come back. Three people were logged onto the office machine that morning. All three have an account of their movements. Only one of those accounts has to survive contact with the access log.",
   sqlTable,
   warrantScript,
   proofBrief,
   revealScript,
   epilogue: caseEpilogue,
   clues,
+  assignment: {
+    email: caseEmail,
+    acceptSummary: "Opens CASE 001 — THE MISSING SPREADSHEET.",
+  },
+  followUps: caseFollowUps,
+  sqlPrompt: "Find the user who deleted payroll.xls.",
+  sqlPlaceholder: "SELECT username\nFROM file_access_logs\nWHERE ",
+  solutionHighlight: "kevin",
+  solveButtonLabel: "ACCUSE KEVIN",
+  assistantBarks,
 };

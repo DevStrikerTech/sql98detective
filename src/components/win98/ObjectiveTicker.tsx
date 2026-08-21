@@ -3,7 +3,6 @@ import { cn } from "@/lib/utils";
 import { Win98Icon } from "./Win98Icon";
 import { useGameStore } from "@/lib/game/gameStore";
 import { currentObjective } from "@/lib/game/objective";
-import { CASE_ID, clues } from "@/content/case001";
 
 /**
  * A pinned "note to self" strip above the taskbar. In-universe guidance:
@@ -11,6 +10,7 @@ import { CASE_ID, clues } from "@/content/case001";
  */
 export function ObjectiveTicker() {
   const phase = useGameStore((s) => s.phase);
+  const caseConfig = useGameStore((s) => s.caseConfig);
   const discovered = useGameStore((s) => s.discoveredClues);
   const sqlUnlocked = useGameStore((s) => s.sqlUnlocked);
   const [collapsed, setCollapsed] = useState(false);
@@ -20,6 +20,7 @@ export function ObjectiveTicker() {
     phase,
     discoveredCount: discovered.length,
     sqlUnlocked,
+    caseConfig,
   });
 
   useEffect(() => {
@@ -28,7 +29,7 @@ export function ObjectiveTicker() {
     return () => window.clearTimeout(t);
   }, [obj.code]);
 
-  if (phase === "idle") return null;
+  if (phase === "idle" || !caseConfig) return null;
 
   return (
     <div className="absolute bottom-[34px] left-2 z-[8400] w-[280px]">
@@ -36,7 +37,7 @@ export function ObjectiveTicker() {
         <div className="win98-titlebar-active flex items-center gap-1 px-[3px] py-[1px]">
           <Win98Icon name="case-files" size={12} />
           <span className="flex-1 text-[11px] font-bold tracking-[0.1em] text-title-ink">
-            CASE {CASE_ID} — {obj.code}
+            CASE {caseConfig.id} — {obj.code}
           </span>
           <button
             type="button"
@@ -62,7 +63,7 @@ export function ObjectiveTicker() {
             <div className="mt-1 flex items-center justify-between gap-2 text-[11px] tracking-[0.1em] text-ink-disabled">
               <span>LOCATION: {obj.where.toUpperCase()}</span>
               <span className="font-bold text-ink">
-                {clues.map((c) => (discovered.includes(c.id) ? "■" : "□")).join(" ")}
+                {caseConfig.clues.map((c) => (discovered.includes(c.id) ? "■" : "□")).join(" ")}
               </span>
             </div>
           </div>

@@ -3,8 +3,6 @@ import { Win98Button } from "../Win98Button";
 import { Win98Icon } from "../Win98Icon";
 import { cn } from "@/lib/utils";
 import {
-  CASE_ID,
-  CASE_TITLE,
   caseHeat,
   clueNotes,
   clues,
@@ -14,12 +12,16 @@ import {
   type ClueId,
 } from "@/content/case001";
 import { useGameStore } from "@/lib/game/gameStore";
+import { useShellStore } from "@/lib/game/shellStore";
+import { useWindowStore } from "@/lib/win98/windowStore";
 import { currentObjective } from "@/lib/game/objective";
+import { LeadsInvestigation } from "./LeadsInvestigation";
 
 type Tab = "dossier" | "suspects" | "evidence";
 
 export function CaseFilesApp({ onRequest }: { onRequest: (what: string) => void }) {
   const phase = useGameStore((s) => s.phase);
+  const caseConfig = useGameStore((s) => s.caseConfig);
   const discovered = useGameStore((s) => s.discoveredClues);
   const sqlUnlocked = useGameStore((s) => s.sqlUnlocked);
   const [tab, setTab] = useState<Tab>("dossier");
@@ -58,11 +60,17 @@ export function CaseFilesApp({ onRequest }: { onRequest: (what: string) => void 
     );
   }
 
+  // Lean cases carry their whole investigation here, driven by config.
+  if (caseConfig?.leads) {
+    return <LeadsInvestigation caseConfig={caseConfig} />;
+  }
+
   const solved = phase === "solved";
   const objective = currentObjective({
     phase,
     discoveredCount: discovered.length,
     sqlUnlocked,
+    caseConfig,
   });
 
   const brokenCount = suspects.filter(
@@ -110,9 +118,11 @@ export function CaseFilesApp({ onRequest }: { onRequest: (what: string) => void 
             <div className="flex items-start justify-between gap-2 border-b-2 border-double border-surface-shadow pb-2">
               <div>
                 <div className="text-[11px] tracking-[0.2em] text-ink-disabled">
-                  PRECINCT DATA SYSTEMS — CASE {CASE_ID}
+                  PRECINCT DATA SYSTEMS — CASE {caseConfig?.id ?? ""}
                 </div>
-                <div className="text-[15px] font-bold tracking-wide text-ink">{CASE_TITLE}</div>
+                <div className="text-[15px] font-bold tracking-wide text-ink">
+                  {caseConfig?.title ?? ""}
+                </div>
                 <div className="text-[11px] text-ink-disabled">
                   Assigned by Chief Brannigan · 8/24/98 · 3rd Floor, Precinct 98
                 </div>

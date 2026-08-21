@@ -26,6 +26,7 @@ import {
 import { useGameStore } from "@/lib/game/gameStore";
 import { useShellStore } from "@/lib/game/shellStore";
 import { useCaseFlow } from "@/lib/game/useCaseFlow";
+import { caseRegistry } from "@/content/caseRegistry";
 import type { IconName } from "./Win98Icon";
 
 const desktopIcons: { app: AppId; label: string; icon: IconName }[] = [
@@ -60,6 +61,8 @@ export function Desktop() {
   const activeId = useActiveWindowId();
 
   const phase = useGameStore((s) => s.phase);
+  const resetGame = useGameStore((s) => s.reset);
+  const offerCase = useGameStore((s) => s.offerCase);
 
   const dialog = useShellStore((s) => s.dialog);
   const showDialog = useShellStore((s) => s.showDialog);
@@ -107,6 +110,34 @@ export function Desktop() {
       setStartOpen(false);
     },
     [open],
+  );
+
+  const caseList = Object.values(caseRegistry).map((c) => ({ id: c.id, title: c.title }));
+
+  const loadCase = useCallback(
+    (caseId: string) => {
+      const config = caseRegistry[caseId];
+      if (!config) return;
+      const begin = () => {
+        resetGame();
+        offerCase(config.id, config);
+        setFlashApp("inbox");
+        open("inbox");
+      };
+      // A case in progress would be set aside — confirm before wiping it.
+      if (phase !== "idle") {
+        showDialog({
+          title: "Load Case?",
+          message: `Loading CASE ${config.id} — ${config.title} sets aside the current investigation.\n\nProgress is not saved.`,
+          icon: "warning",
+          okLabel: "LOAD CASE",
+          onOk: begin,
+        });
+      } else {
+        begin();
+      }
+    },
+    [phase, resetGame, offerCase, setFlashApp, open, showDialog],
   );
 
   const dismissGuide = useCallback(() => {
@@ -203,6 +234,8 @@ export function Desktop() {
           }
           onNotImplemented={notImplemented}
           onClose={() => setStartOpen(false)}
+          cases={caseList}
+          onLoadCase={loadCase}
         />
       )}
 

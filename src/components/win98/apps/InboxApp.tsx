@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { Win98Icon } from "../Win98Icon";
 import { Win98Button } from "../Win98Button";
 import { emails, type Mail } from "@/content/emails";
-import { mailActions, mailRoomChatter, caseEmail, caseFollowUps } from "@/content/case001";
+import { mailActions, mailRoomChatter } from "@/content/case001";
 import { useGameStore } from "@/lib/game/gameStore";
 import { useShellStore } from "@/lib/game/shellStore";
 import { useWindowStore } from "@/lib/win98/windowStore";
@@ -19,31 +19,27 @@ export function InboxApp() {
   const openWindow = useWindowStore((s) => s.open);
 
   const accepted = phase !== "idle" && phase !== "offered";
+  const assignmentEmail = caseConfig?.assignment.email ?? null;
 
   const list: Mail[] = useMemo(() => {
-    if (phase === "idle") return emails;
-    if (!caseConfig) return emails;
+    if (phase === "idle" || !caseConfig || !assignmentEmail) return emails;
 
-    if (caseConfig.id === "001") {
-      const extras = caseFollowUps
-        .filter((f) => {
-          if (f.showAfter === "accepted") return accepted;
-          if (f.showAfter === "sql") return sqlUnlocked;
-          return phase === "solved";
-        })
-        .map(({ showAfter: _showAfter, ...m }) => m as Mail);
-      return [...extras.slice().reverse(), caseEmail, ...emails];
-    }
-
-    return emails;
-  }, [phase, accepted, sqlUnlocked, caseConfig]);
+    const extras = caseConfig.followUps
+      .filter((f) => {
+        if (f.showAfter === "accepted") return accepted;
+        if (f.showAfter === "sql") return sqlUnlocked;
+        return phase === "solved";
+      })
+      .map(({ showAfter: _showAfter, ...m }) => m as Mail);
+    return [...extras.slice().reverse(), assignmentEmail, ...emails];
+  }, [phase, accepted, sqlUnlocked, caseConfig, assignmentEmail]);
 
   const [selectedId, setSelectedId] = useState<string>(list[0]!.id);
   const [read, setRead] = useState<string[]>([]);
 
   useEffect(() => {
-    if (phase === "offered" && caseConfig?.id === "001") setSelectedId(caseEmail.id);
-  }, [phase, caseConfig?.id]);
+    if (phase === "offered" && assignmentEmail) setSelectedId(assignmentEmail.id);
+  }, [phase, assignmentEmail]);
 
   useEffect(() => {
     setRead((r) => (r.includes(selectedId) ? r : [...r, selectedId]));
@@ -70,7 +66,7 @@ export function InboxApp() {
   }, [list, seen, playCue]);
 
   const mail = list.find((m) => m.id === selectedId) ?? list[0]!;
-  const isCaseMail = caseConfig?.id === "001" && mail.id === caseEmail.id;
+  const isCaseMail = !!assignmentEmail && mail.id === assignmentEmail.id;
   const unreadCount = list.filter((m) => !read.includes(m.id)).length;
 
   const accept = () => {
@@ -80,7 +76,7 @@ export function InboxApp() {
     openWindow("case-files");
     showDialog({
       title: "Case Assigned",
-      message: `CASE ${caseConfig.id} — ${caseConfig.title} has been added to your Case Files.\n\nObjective: investigate and solve the case.`,
+      message: `CASE ${caseConfig.id} — ${caseConfig.title} has been added to your Case Files.\n\n${caseConfig.assignment.acceptSummary}`,
       icon: "case-files",
       okLabel: "Get to work",
     });
@@ -136,7 +132,7 @@ export function InboxApp() {
           </thead>
           <tbody>
             {list.map((m) => {
-              const urgent = caseConfig?.id === "001" && m.id === caseEmail.id && !accepted;
+              const urgent = !!assignmentEmail && m.id === assignmentEmail.id && !accepted;
               const unread = !read.includes(m.id);
               return (
                 <tr
@@ -195,11 +191,11 @@ export function InboxApp() {
           {mail.body}
         </pre>
 
-        {isCaseMail && (
+        {isCaseMail && caseConfig && (
           <div className="win98-groove mt-3 flex items-center gap-3 bg-surface p-2">
             {accepted ? (
               <span className="text-[11px] text-ink">
-                CASE 001 accepted. See Case Files for your objective.
+                CASE {caseConfig.id} accepted. See Case Files for your objective.
               </span>
             ) : (
               <>
@@ -207,7 +203,7 @@ export function InboxApp() {
                   ACCEPT CASE
                 </Win98Button>
                 <span className="text-[11px] text-ink-disabled">
-                  Opens CASE 001 — THE MISSING SPREADSHEET.
+                  {caseConfig.assignment.acceptSummary}
                 </span>
               </>
             )}

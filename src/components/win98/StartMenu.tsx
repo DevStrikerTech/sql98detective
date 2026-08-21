@@ -7,6 +7,8 @@ type Props = {
   onShutdown: () => void;
   onNotImplemented: (what: string) => void;
   onClose: () => void;
+  cases: { id: string; title: string }[];
+  onLoadCase: (caseId: string) => void;
 };
 
 type Item = {
@@ -16,7 +18,14 @@ type Item = {
   action: () => void;
 };
 
-export function StartMenu({ onOpenApp, onShutdown, onNotImplemented, onClose }: Props) {
+export function StartMenu({
+  onOpenApp,
+  onShutdown,
+  onNotImplemented,
+  onClose,
+  cases,
+  onLoadCase,
+}: Props) {
   const run = (fn: () => void) => () => {
     fn();
     onClose();
@@ -37,8 +46,14 @@ export function StartMenu({ onOpenApp, onShutdown, onNotImplemented, onClose }: 
     { label: "Run...", icon: "sql-exe", action: () => onNotImplemented("Run") },
   ];
 
+  const caseItems: Item[] = cases.map((c) => ({
+    label: `Case ${c.id} — ${c.title}`,
+    icon: "case-files",
+    action: () => onLoadCase(c.id),
+  }));
+
   return (
-    <div className="win98-out anim-snap-open absolute bottom-[28px] left-0 z-[8000] flex w-[210px] bg-surface p-[3px]">
+    <div className="win98-out anim-snap-open absolute bottom-[28px] left-0 z-[8600] flex w-[240px] bg-surface p-[3px]">
       <div className="win98-titlebar-active flex w-[22px] shrink-0 items-end justify-center pb-3">
         <span
           className="text-[13px] font-bold whitespace-nowrap text-title-ink"
@@ -49,6 +64,13 @@ export function StartMenu({ onOpenApp, onShutdown, onNotImplemented, onClose }: 
       </div>
       <div className="flex-1">
         {top.map((item) => (
+          <MenuRow key={item.label} item={item} onRun={run} />
+        ))}
+        <div className="my-[3px] border-t border-surface-shadow border-b border-b-surface-hilite" />
+        <div className="px-[6px] pb-[2px] text-[10px] font-bold tracking-[0.14em] text-ink-disabled">
+          LOAD CASE
+        </div>
+        {caseItems.map((item) => (
           <MenuRow key={item.label} item={item} onRun={run} />
         ))}
         <div className="my-[3px] border-t border-surface-shadow border-b border-b-surface-hilite" />

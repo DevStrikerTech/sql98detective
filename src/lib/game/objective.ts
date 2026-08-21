@@ -1,4 +1,5 @@
 import type { GamePhase } from "./gameStore";
+import type { CaseConfig } from "@/content/caseTypes";
 
 export type Objective = { code: string; text: string; where: string };
 
@@ -7,8 +8,9 @@ export function currentObjective(args: {
   phase: GamePhase;
   discoveredCount: number;
   sqlUnlocked: boolean;
+  caseConfig?: CaseConfig | null;
 }): Objective {
-  const { phase, discoveredCount, sqlUnlocked } = args;
+  const { phase, discoveredCount, sqlUnlocked, caseConfig } = args;
   if (phase === "idle")
     return {
       code: "STANDBY",
@@ -36,9 +38,22 @@ export function currentObjective(args: {
   if (sqlUnlocked)
     return {
       code: "OBJ-03",
-      text: "Suspicion is free. Proof costs one query. Ask who deleted payroll.xls.",
+      text: caseConfig
+        ? `Suspicion is free. Proof costs one query. ${caseConfig.sqlPrompt}`
+        : "Suspicion is free. Proof costs one query. Ask the record directly.",
       where: "SQL.exe",
     };
+
+  // Lean cases collect their clues by pursuing leads in the Case Files app.
+  if (caseConfig?.leads) {
+    const total = caseConfig.leads.length;
+    return {
+      code: "OBJ-01",
+      text: `Pursue the leads and file the evidence — ${discoveredCount} of ${total} so far.`,
+      where: "Case Files",
+    };
+  }
+
   if (discoveredCount === 0)
     return {
       code: "OBJ-01",

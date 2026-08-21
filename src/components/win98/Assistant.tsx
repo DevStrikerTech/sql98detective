@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { Win98Icon } from "./Win98Icon";
 import { useShellStore } from "@/lib/game/shellStore";
 import { useGameStore } from "@/lib/game/gameStore";
-import { assistantBarks } from "@/content/case001";
 
 /** QUERY — a small, dry desktop helper. Appears briefly, then goes away. */
 export function Assistant() {
@@ -29,12 +28,14 @@ export function Assistant() {
   /* Idle muttering: QUERY gets bored while the detective reads. */
   const say = useShellStore((s) => s.say);
   const phase = useGameStore((s) => s.phase);
+  const barks = useGameStore((s) => s.caseConfig?.assistantBarks);
   const lineRef = useRef(line);
   lineRef.current = line;
   useEffect(() => {
     if (phase === "idle" || phase === "offered" || phase === "solved") return;
+    if (!barks || barks.length === 0) return;
     // Shuffled once, so QUERY never repeats itself twice in a row.
-    const order = assistantBarks
+    const order = barks
       .map((t, i) => ({ t, k: (i * 7919 + Date.now()) % 1000 }))
       .sort((a, b) => a.k - b.k)
       .map((x) => x.t);
@@ -45,7 +46,7 @@ export function Assistant() {
       n += 1;
     }, 36000);
     return () => window.clearInterval(id);
-  }, [phase, say]);
+  }, [phase, say, barks]);
 
   if (!line) return null;
 

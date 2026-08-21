@@ -21,6 +21,7 @@ export function MyComputerApp() {
   }, []);
 
   const phase = useGameStore((s) => s.phase);
+  const caseConfig = useGameStore((s) => s.caseConfig);
   const discoverClue = useGameStore((s) => s.discoverClue);
   const showDialog = useShellStore((s) => s.showDialog);
   const say = useShellStore((s) => s.say);
@@ -43,6 +44,9 @@ export function MyComputerApp() {
           .join("\\");
   const selected = items.find((i) => i.name === sel) ?? null;
   const investigating = phase !== "idle" && phase !== "offered";
+  // Lean cases (Case 002) are worked from the Case Files leads board, not this
+  // machine. Don't surface another case's disk while one is active.
+  const leanCase = investigating && !!caseConfig?.leads;
 
   const openNode = (node: FsNode) => {
     if (node.children) {
@@ -123,6 +127,20 @@ export function MyComputerApp() {
         });
     }
   };
+
+  if (leanCase) {
+    return (
+      <div className="win98-field flex min-h-0 flex-1 flex-col items-center justify-center gap-3 p-4 text-center">
+        <Win98Icon name="case-files" size={40} />
+        <div className="text-[13px] font-bold text-ink">Worked from the Case Files</div>
+        <p className="max-w-[300px] text-[11px] leading-[1.6] text-ink-disabled">
+          This case is run from the leads board in Case Files, not from the office disk. Pursue your
+          leads there to unlock the query engine.
+        </p>
+        <Win98Button onClick={() => openWindow("case-files")}>Open Case Files</Win98Button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-[3px]">

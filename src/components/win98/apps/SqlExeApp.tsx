@@ -29,7 +29,7 @@ export function SqlExeApp() {
     [caseConfig],
   );
 
-  const [query, setQuery] = useState("SELECT username\nFROM file_access_logs\nWHERE ");
+  const [query, setQuery] = useState(caseConfig?.sqlPlaceholder ?? "");
   const [lines, setLines] = useState<string[]>([...BOOT_LINES, "", "READY."]);
   const [running, setRunning] = useState(false);
   const [status, setStatus] = useState("READY");
@@ -83,7 +83,9 @@ export function SqlExeApp() {
         <div className="text-[12px] opacity-60">
           {phase === "idle" || phase === "offered"
             ? "No active investigation."
-            : "Hint: the machine keeps logs. C:\\OFFICE\\LOGS\\"}
+            : caseConfig?.leads
+              ? "Hint: pursue every lead in the Case Files."
+              : "Hint: the machine keeps logs. C:\\OFFICE\\LOGS\\"}
         </div>
         {phase !== "idle" && phase !== "offered" && (
           <div className="win98-in bg-terminal px-3 py-1 text-[12px] tracking-[0.14em]">
@@ -192,14 +194,15 @@ export function SqlExeApp() {
         <Win98Button className="min-w-0 px-2" onClick={nextHint} disabled={running}>
           Hint
         </Win98Button>
-        <span className="ml-auto pr-1 text-[11px] text-ink-disabled">Table: file_access_logs</span>
+        <span className="ml-auto pr-1 text-[11px] text-ink-disabled">
+          Table: {caseConfig?.sqlTable.tableName ?? "file_access_logs"}
+        </span>
       </div>
 
       {caseConfig && (
         <>
           <div className="win98-groove shrink-0 bg-surface px-2 py-1 text-[11px]">
-            <b>INVESTIGATION QUERY:</b>{" "}
-            {caseConfig.id === "001" ? "Find the user who deleted payroll.xls." : "Solve the case."}
+            <b>INVESTIGATION QUERY:</b> {caseConfig.sqlPrompt}
           </div>
 
           {/* Suspicion on the left, proof on the right. The gap between them is the game. */}
@@ -271,7 +274,9 @@ export function SqlExeApp() {
                       className={cn(
                         "border border-terminal-ink/50 px-2",
                         result.correct &&
-                          String(cell).toLowerCase() === "kevin" &&
+                          caseConfig &&
+                          String(cell).toLowerCase() ===
+                            caseConfig.solutionHighlight.toLowerCase() &&
                           "anim-blink font-bold",
                       )}
                     >
@@ -329,7 +334,7 @@ export function SqlExeApp() {
                 fireScreenFx("flicker");
               }}
             >
-              {caseConfig.id === "001" ? "ACCUSE KEVIN" : "SUBMIT FINDING"}
+              {caseConfig.solveButtonLabel}
             </Win98Button>
           )}
       </div>
