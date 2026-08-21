@@ -57,7 +57,9 @@ export function useCaseFlow() {
           ? "No case assigned  ·  folder empty"
           : `CASE ${CASE_ID} — ${discovered.length}/${clues.length} exhibits filed`;
       case "sql-exe":
-        return sqlUnlocked ? "Query engine online" : "Query engine locked";
+        return sqlUnlocked
+          ? "Query engine online  ·  the log is waiting to be asked"
+          : "Query engine locked  ·  earn it in the logs";
       case "log-viewer":
         return "6 record(s)";
       case "recycle-bin":
