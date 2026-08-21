@@ -45,7 +45,7 @@ const menusFor: Partial<Record<AppId, string[]>> = {
   "recycle-bin": ["File", "Edit", "View", "Help"],
 };
 
-const FIRST_RUN_GUIDE_KEY = "sql98-first-run-guide-v3";
+const FIRST_RUN_KEY = "sql98-first-run-guide-v3";
 const INTRO_THEME_PATH = "/audio/intro-theme.mp3";
 
 export function Desktop() {
@@ -60,7 +60,6 @@ export function Desktop() {
   const activeId = useActiveWindowId();
 
   const phase = useGameStore((s) => s.phase);
-  const { statusFor } = useCaseFlow();
 
   const dialog = useShellStore((s) => s.dialog);
   const showDialog = useShellStore((s) => s.showDialog);
@@ -74,41 +73,33 @@ export function Desktop() {
   const [flashingId, setFlashingId] = useState<string | null>(null);
   const [frozen, setFrozen] = useState(false);
   const [reportDismissed, setReportDismissed] = useState(false);
-  const [showFirstRunGuide, setShowFirstRunGuide] = useState(false);
-  const [briefingStep, setBriefingStep] = useState(-1);
-  const [introMusicPlaying, setIntroMusicPlaying] = useState(false);
-  const [introMusicError, setIntroMusicError] = useState(false);
+  const [guideVisible, setGuideVisible] = useState(false);
   const introAudioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (!window.localStorage.getItem(FIRST_RUN_GUIDE_KEY)) {
-      setShowFirstRunGuide(true);
+    if (!window.localStorage.getItem(FIRST_RUN_KEY)) {
+      setGuideVisible(true);
     }
   }, []);
 
+  // Play intro theme while the guide is up; stop on dismiss or mute.
   useEffect(() => {
-    if (!showFirstRunGuide || muted || typeof window === "undefined") {
-      const audio = introAudioRef.current;
-      if (audio) {
-        audio.pause();
-        audio.currentTime = 0;
-      }
-      setIntroMusicPlaying(false);
+    if (!guideVisible || muted) {
+      introAudioRef.current?.pause();
       return;
     }
-
     const audio = introAudioRef.current ?? new Audio(INTRO_THEME_PATH);
     introAudioRef.current = audio;
     audio.loop = true;
-    audio.volume = 0.45;
-
+    audio.volume = 0.4;
+    void audio.play().catch(() => {});
     return () => {
       audio.pause();
-      audio.currentTime = 0;
-      setIntroMusicPlaying(false);
     };
-  }, [showFirstRunGuide, muted]);
+  }, [guideVisible, muted]);
+
+  const { statusFor } = useCaseFlow(guideVisible);
 
   const openApp = useCallback(
     (app: AppId) => {
@@ -118,40 +109,16 @@ export function Desktop() {
     [open],
   );
 
-  const beginFromGuide = useCallback(() => {
+  const dismissGuide = useCallback(() => {
     if (typeof window !== "undefined") {
-      window.localStorage.setItem(FIRST_RUN_GUIDE_KEY, "seen");
+      window.localStorage.setItem(FIRST_RUN_KEY, "seen");
     }
-    introAudioRef.current?.pause();
-    if (introAudioRef.current) introAudioRef.current.currentTime = 0;
-    setIntroMusicPlaying(false);
-    setShowFirstRunGuide(false);
-    // Do not open inbox directly here. useCaseFlow's "PRIORITY MESSAGE"
-    // dialog is already in state (hidden behind the guide overlay at z-9300).
-    // Clearing the guide lets it surface — the player then clicks OPEN INBOX
-    // themselves, preserving the intended onboarding beat.
-  }, []);
-
-  const startBriefing = useCallback(() => {
     const audio = introAudioRef.current;
-    setBriefingStep(0);
-    setIntroMusicError(false);
-    if (!audio || muted) return;
-    audio.currentTime = 0;
-    void audio
-      .play()
-      .then(() => {
-        setIntroMusicPlaying(true);
-        setIntroMusicError(false);
-      })
-      .catch(() => {
-        setIntroMusicPlaying(false);
-        setIntroMusicError(true);
-      });
-  }, [muted]);
-
-  const nextBriefingStep = useCallback(() => {
-    setBriefingStep((s) => s + 1);
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+    setGuideVisible(false);
   }, []);
 
   const newestWindowId = windows[windows.length - 1]?.id ?? null;
@@ -162,7 +129,6 @@ export function Desktop() {
     return () => clearTimeout(t);
   }, [newestWindowId]);
 
-  /* Clear icon flashing after a few blinks. */
   useEffect(() => {
     if (!flashApp) return;
     const t = setTimeout(() => setFlashApp(null), 4000);
@@ -253,16 +219,7 @@ export function Desktop() {
       <EvidenceToast />
       <ScreenFxLayer />
       <Assistant />
-      {showFirstRunGuide && (
-        <FirstRunGuide
-          step={briefingStep}
-          musicPlaying={introMusicPlaying}
-          musicError={introMusicError}
-          onStartBriefing={startBriefing}
-          onNext={nextBriefingStep}
-          onBegin={beginFromGuide}
-        />
-      )}
+      {guideVisible && <FirstRunGuide onBegin={dismissGuide} />}
 
       {dialog && (
         <Win98Dialog

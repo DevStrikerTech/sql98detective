@@ -4,7 +4,7 @@ import { useShellStore } from "./shellStore";
 import { CASE_ID, clues } from "@/content/case001";
 import { useWindowStore, type AppId } from "@/lib/win98/windowStore";
 
-export function useCaseFlow() {
+export function useCaseFlow(guideActive = false) {
   const phase = useGameStore((s) => s.phase);
   const offerCase = useGameStore((s) => s.offerCase);
   const discovered = useGameStore((s) => s.discoveredClues);
@@ -18,7 +18,7 @@ export function useCaseFlow() {
   const openWindow = useWindowStore((s) => s.open);
 
   useEffect(() => {
-    if (phase !== "idle") return;
+    if (phase !== "idle" || guideActive) return;
     const timers: number[] = [];
     timers.push(
       window.setTimeout(() => {
@@ -44,7 +44,17 @@ export function useCaseFlow() {
       }, 4200),
     );
     return () => timers.forEach(clearTimeout);
-  }, [phase, offerCase, setFlashApp, playCue, showDialog, fireScreenFx, say, openWindow]);
+  }, [
+    phase,
+    guideActive,
+    offerCase,
+    setFlashApp,
+    playCue,
+    showDialog,
+    fireScreenFx,
+    say,
+    openWindow,
+  ]);
 
   const statusFor = (app: AppId): string | undefined => {
     switch (app) {
