@@ -3,29 +3,48 @@ import { cn } from "@/lib/utils";
 import { Win98Icon } from "../Win98Icon";
 import { Win98Button } from "../Win98Button";
 import { emails, type Mail } from "@/content/emails";
-import { CASE_ID, caseEmail } from "@/content/case001";
+import { CASE_ID, caseEmail, caseFollowUps } from "@/content/case001";
 import { useGameStore } from "@/lib/game/gameStore";
 import { useShellStore } from "@/lib/game/shellStore";
 import { useWindowStore } from "@/lib/win98/windowStore";
 
 export function InboxApp() {
   const phase = useGameStore((s) => s.phase);
+  const sqlUnlocked = useGameStore((s) => s.sqlUnlocked);
   const startCase = useGameStore((s) => s.startCase);
   const showDialog = useShellStore((s) => s.showDialog);
   const say = useShellStore((s) => s.say);
   const playCue = useShellStore((s) => s.playCue);
   const openWindow = useWindowStore((s) => s.open);
 
-  const list: Mail[] = useMemo(() => (phase === "idle" ? emails : [caseEmail, ...emails]), [phase]);
+  const accepted = phase !== "idle" && phase !== "offered";
+
+  const list: Mail[] = useMemo(() => {
+    if (phase === "idle") return emails;
+    const extras = caseFollowUps
+      .filter((f) => {
+        if (f.showAfter === "accepted") return accepted;
+        if (f.showAfter === "sql") return sqlUnlocked;
+        return phase === "solved";
+      })
+      .map(({ showAfter: _showAfter, ...m }) => m as Mail);
+    return [...extras.slice().reverse(), caseEmail, ...emails];
+  }, [phase, accepted, sqlUnlocked]);
+
   const [selectedId, setSelectedId] = useState<string>(list[0]!.id);
+  const [read, setRead] = useState<string[]>([]);
 
   useEffect(() => {
     if (phase === "offered") setSelectedId(caseEmail.id);
   }, [phase]);
 
+  useEffect(() => {
+    setRead((r) => (r.includes(selectedId) ? r : [...r, selectedId]));
+  }, [selectedId]);
+
   const mail = list.find((m) => m.id === selectedId) ?? list[0]!;
   const isCaseMail = mail.id === caseEmail.id;
-  const accepted = phase !== "idle" && phase !== "offered";
+  const unreadCount = list.filter((m) => !read.includes(m.id)).length;
 
   const accept = () => {
     startCase(CASE_ID);
@@ -34,7 +53,7 @@ export function InboxApp() {
     showDialog({
       title: "Case Assigned",
       message:
-        "CASE 001 — THE MISSING SPREADSHEET has been added to your Case Files.\n\nObjective: determine who deleted payroll.xls.",
+        "CASE 001 — THE MISSING SPREADSHEET has been added to your Case Files.\n\nThree names. One deleted file. One morning.\n\nObjective: determine who deleted payroll.xls.",
       icon: "case-files",
       okLabel: "Get to work",
     });
@@ -59,7 +78,8 @@ export function InboxApp() {
           </thead>
           <tbody>
             {list.map((m) => {
-              const urgent = m.id === caseEmail.id;
+              const urgent = m.id === caseEmail.id && !accepted;
+              const unread = !read.includes(m.id);
               return (
                 <tr
                   key={m.id}
@@ -70,12 +90,21 @@ export function InboxApp() {
                   )}
                 >
                   <td className="px-[4px] py-[1px] whitespace-nowrap">
-                    <span className={cn("inline-flex items-center gap-1", urgent && "font-bold")}>
-                      <Win98Icon name={urgent ? "warning" : "mail"} size={12} />
+                    <span
+                      className={cn(
+                        "inline-flex items-center gap-1",
+                        (urgent || unread) && "font-bold",
+                      )}
+                    >
+                      <span className={cn(urgent && "anim-blink")}>
+                        <Win98Icon name={urgent ? "warning" : "mail"} size={12} />
+                      </span>
                       {m.from}
                     </span>
                   </td>
-                  <td className={cn("px-[4px] py-[1px]", urgent && "font-bold")}>{m.subject}</td>
+                  <td className={cn("px-[4px] py-[1px]", (urgent || unread) && "font-bold")}>
+                    {m.subject}
+                  </td>
                   <td className="px-[4px] py-[1px] whitespace-nowrap">{m.date}</td>
                 </tr>
               );
@@ -93,7 +122,10 @@ export function InboxApp() {
             <b>Subject:</b> {mail.subject}
           </div>
         </div>
-        <pre className="font-ui text-[11px] leading-[1.5] whitespace-pre-wrap text-ink">
+        <pre
+          key={mail.id}
+          className="anim-redraw font-ui text-[11px] leading-[1.5] whitespace-pre-wrap text-ink"
+        >
           {mail.body}
         </pre>
 
@@ -105,7 +137,7 @@ export function InboxApp() {
               </span>
             ) : (
               <>
-                <Win98Button onClick={accept} className="font-bold">
+                <Win98Button onClick={accept} className="anim-pulse-border font-bold">
                   ACCEPT CASE
                 </Win98Button>
                 <span className="text-[11px] text-ink-disabled">
@@ -115,6 +147,11 @@ export function InboxApp() {
             )}
           </div>
         )}
+      </div>
+
+      <div className="win98-in shrink-0 truncate px-[5px] py-[2px] text-[11px] text-ink-disabled">
+        {list.length} message(s), {unreadCount} unread
+        {phase === "offered" ? " — the Chief is waiting." : ""}
       </div>
     </div>
   );

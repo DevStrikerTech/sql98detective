@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Win98Icon } from "../Win98Icon";
 import { Win98Button } from "../Win98Button";
-import { clues, fileSystem, type FsNode } from "@/content/case001";
+import { clues, fileSystem, precinctChatter, type FsNode } from "@/content/case001";
+
 import { useGameStore } from "@/lib/game/gameStore";
 import { useShellStore } from "@/lib/game/shellStore";
 import { useWindowStore } from "@/lib/win98/windowStore";
@@ -10,6 +11,17 @@ import { useWindowStore } from "@/lib/win98/windowStore";
 export function MyComputerApp() {
   const [path, setPath] = useState<FsNode[]>([]);
   const [sel, setSel] = useState<string | null>(null);
+  const [chatter, setChatter] = useState(0);
+
+  // The building keeps muttering to itself in the status bar.
+  useEffect(() => {
+    const id = window.setInterval(
+      () => setChatter((c) => (c + 1) % precinctChatter.length),
+      9000,
+    );
+    return () => window.clearInterval(id);
+  }, []);
+
 
   const phase = useGameStore((s) => s.phase);
   const discoverClue = useGameStore((s) => s.discoverClue);
@@ -160,7 +172,10 @@ export function MyComputerApp() {
 
       <div className="flex shrink-0 items-center gap-2">
         <div className="win98-in flex-1 truncate px-[5px] py-[2px] text-[11px] text-ink-disabled">
-          {selected ? selected.detail : `${items.length} object(s)`}
+          {selected
+            ? selected.detail
+            : `${items.length} object(s) — ${precinctChatter[chatter]}`}
+
         </div>
         <Win98Button disabled={!selected} onClick={() => selected && openNode(selected)}>
           Open

@@ -21,14 +21,17 @@ export function CaseClosed({ onDismiss }: { onDismiss: () => void }) {
   const time = elapsed ? `${Math.floor(elapsed / 60)}m ${elapsed % 60}s` : "—";
 
   const report: [string, string, boolean?][] = [
-    ["CULPRIT", "KEVIN", true],
-    ["CAUSE", "Deleted payroll.xls at 09:21."],
+    ["CULPRIT", "KEVIN — Junior IT, Desk 9", true],
+    ["CAUSE", "Deleted payroll.xls at 09:21, two minutes after Linda logged off."],
     ["MOTIVE", "Filed under: 'we may never know'."],
-    ["SQL CONCEPTS USED", "SELECT · WHERE · AND"],
+    ["CLEARED", "Linda (closed the file properly). Gary (was downloading a banger)."],
+    ["DECISIVE TOOL", "SELECT · WHERE · AND"],
     ["TIME", time],
     ["HINTS USED", String(hintsUsed)],
+    ["CHIEF'S NOTE", "\"Good work. Do not touch the donut case.\""],
     ["RANK", hintsUsed === 0 ? "DETECTIVE FIRST CLASS" : "DETECTIVE"],
   ];
+
 
   useEffect(() => {
     const timers: number[] = [];

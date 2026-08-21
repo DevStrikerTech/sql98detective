@@ -11,6 +11,13 @@ export type Suspect = {
   name: string;
   role: string;
   statement: string;
+  /** Where they sit — the precinct is a real place with real bad carpet. */
+  desk: string;
+  alibi: string;
+  /** Small human detail the detective would notice. */
+  tell: string;
+  /** If this clue is discovered, the statement above stops holding up. */
+  contradictedBy?: ClueId;
 };
 
 export const suspects: Suspect[] = [
@@ -19,20 +26,31 @@ export const suspects: Suspect[] = [
     name: "Linda",
     role: "Accounting",
     statement: '"I opened payroll.xls to review it. That is all. I alphabetise my staplers."',
+    desk: "Desk 4 — by the fern nobody waters",
+    alibi: "Signed out of the file at 09:15. Was queueing for the good printer by 09:17.",
+    tell: "Keeps a laminated copy of the coffee rota. Laminated.",
   },
   {
     id: "kevin",
     name: "Kevin",
     role: "Junior IT",
     statement: '"I never touched payroll.xls. Not once. Why would I. I wouldn\'t."',
+    desk: "Desk 9 — under the server fan, permanently cold",
+    alibi: "Claims he was 'reimaging a machine'. Cannot say which machine.",
+    tell: "Said 'never' three times in one sentence. Nobody needs three.",
+    contradictedBy: "kevin-timing",
   },
   {
     id: "gary",
     name: "Gary",
     role: "Office troublemaker",
     statement: '"I don\'t even know what a spreadsheet is. Is it a kind of jam?"',
+    desk: "Desk 12 — visible from the vending machine, deliberately",
+    alibi: "Downloading a 8MB MP3 at 09:20. On this connection, that is an ironclad alibi.",
+    tell: "Guilty of everything except, annoyingly, this.",
   },
 ];
+
 
 export type ClueId = "payroll-missing" | "access-logs" | "kevin-timing";
 
@@ -244,3 +262,76 @@ export const sqlTable: SqlTableConfig = {
     multiple: "Unless everyone deleted payroll.xls, we may need to narrow that down.",
   },
 };
+
+/** Marginalia the log viewer prints next to each record. Flavour, not logic. */
+export const logNotes: Record<number, string> = {
+  1: "Routine. Linda opens payroll.xls most mornings before the tea trolley.",
+  2: "Closed cleanly four minutes later. File still existed at 09:15.",
+  3: "8,102 KB over the precinct connection. Gary was busy being Gary.",
+  4: "Opened. Two minutes after Linda left. Kevin says this never happened.",
+  5: "DELETE. Same minute, same user. The record does not editorialise.",
+  6: "system.log opened at 09:23. Somebody went looking at what the machine saw.",
+};
+
+/** Idle precinct noise for the status bars — the building keeps talking. */
+export const precinctChatter: string[] = [
+  "Break room printer jammed again. Third time today.",
+  "Somebody has re-labelled the coffee as 'EVIDENCE'.",
+  "Reminder: DROP TABLE is not a search command.",
+  "The fern by Desk 4 has been declared a fire hazard.",
+  "Chief Brannigan is pacing. Audibly.",
+  "Screensaver Training Module 3: Flying Toasters. 14:00.",
+];
+
+/** Follow-up mail that lands as the case progresses. Purely narrative. */
+export type FollowUpStage = "accepted" | "sql" | "solved";
+
+export const caseFollowUps: {
+  id: string;
+  from: string;
+  subject: string;
+  date: string;
+  body: string;
+  showAfter: FollowUpStage;
+}[] = [
+  {
+    id: "linda-statement",
+    from: "Linda (Accounting)",
+    subject: "I want it on record",
+    date: "8/24/98 09:41",
+    body: "Detective,\n\nI opened payroll.xls at 09:11 and closed it at 09:15. You may verify this. I would like it noted that I closed it. Properly. With the menu, not the little X.\n\nI have attached nothing because I do not trust attachments.\n\n— Linda",
+    showAfter: "accepted",
+  },
+  {
+    id: "gary-defence",
+    from: "Gary",
+    subject: "wasnt me",
+    date: "8/24/98 09:44",
+    body: "hi\n\nheard theres a spreadsheet thing. i was downloading a song at the time. it took ages. you can check.\n\nalso the song is a banger if you want it\n\ngary",
+    showAfter: "accepted",
+  },
+  {
+    id: "it-audit",
+    from: "IT Department",
+    subject: "RE: audit trail request",
+    date: "8/24/98 09:52",
+    body: "Query access has been enabled on your terminal.\n\nPlease note: file_access_logs is READ ONLY. We have learned this lesson together, as a precinct.\n\nColumns are: id, username, filename, action, timestamp.",
+    showAfter: "sql",
+  },
+  {
+    id: "kevin-panic",
+    from: "Kevin (Junior IT)",
+    subject: "quick question totally unrelated",
+    date: "8/24/98 09:58",
+    body: "hey so hypothetically\n\nif a log file said someone did something, could the log be wrong? like a clock issue? or a haunting?\n\nasking for the machine\n\n- Kevin",
+    showAfter: "sql",
+  },
+  {
+    id: "chief-congrats",
+    from: "Chief Brannigan",
+    subject: "RE: RE: URGENT!!! payroll.xls IS GONE",
+    date: "8/24/98 10:14",
+    body: "GOOD WORK DETECTIVE.\n\nKevin has been escorted to the break room for a conversation about honesty and backups.\n\nAccounting has stopped screaming. Finance has started, but for unrelated reasons.\n\nTake the rest of the morning. Not the afternoon.\n\n— Chief",
+    showAfter: "solved",
+  },
+];
