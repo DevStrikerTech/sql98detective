@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import { useGameStore } from "./gameStore";
 import { useShellStore } from "./shellStore";
-import { CASE_ID, clues } from "@/content/case001";
+import { getCaseConfig } from "@/content/caseRegistry";
 import { useWindowStore, type AppId } from "@/lib/win98/windowStore";
 
 export function useCaseFlow(guideActive = false) {
   const phase = useGameStore((s) => s.phase);
+  const caseConfig = useGameStore((s) => s.caseConfig);
   const offerCase = useGameStore((s) => s.offerCase);
   const discovered = useGameStore((s) => s.discoveredClues);
   const sqlUnlocked = useGameStore((s) => s.sqlUnlocked);
@@ -28,7 +29,8 @@ export function useCaseFlow(guideActive = false) {
     );
     timers.push(
       window.setTimeout(() => {
-        offerCase(CASE_ID);
+        const config = getCaseConfig("001");
+        offerCase("001", config);
         setFlashApp("inbox");
         fireScreenFx("flicker");
         playCue("message");
@@ -65,7 +67,9 @@ export function useCaseFlow(guideActive = false) {
       case "case-files":
         return phase === "idle" || phase === "offered"
           ? "No case assigned  ·  folder empty"
-          : `CASE ${CASE_ID} — ${discovered.length}/${clues.length} exhibits filed`;
+          : caseConfig
+            ? `CASE ${caseConfig.id} — ${discovered.length}/${caseConfig.clues.length} exhibits filed`
+            : "No case data";
       case "sql-exe":
         if (phase === "revealed") return "1 row returned  ·  the name is on the screen";
         if (phase === "solved") return "Query engine idle  ·  it did its job";

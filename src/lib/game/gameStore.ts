@@ -1,11 +1,13 @@
 import { create } from "zustand";
 import type { AppId } from "@/lib/win98/windowStore";
+import type { CaseConfig } from "@/content/caseTypes";
 
 export type GamePhase = "idle" | "offered" | "investigating" | "revealed" | "solved";
 
 export type GameStore = {
   phase: GamePhase;
   currentCaseId: string | null;
+  caseConfig: CaseConfig | null;
   discoveredClues: string[];
   completedObjectives: string[];
   unlockedApps: AppId[];
@@ -14,8 +16,8 @@ export type GameStore = {
   startedAt: number | null;
   finishedAt: number | null;
 
-  offerCase: (caseId: string) => void;
-  startCase: (caseId: string) => void;
+  offerCase: (caseId: string, config: CaseConfig) => void;
+  startCase: (caseId: string, config: CaseConfig) => void;
   discoverClue: (clueId: string) => boolean;
   completeObjective: (objectiveId: string) => void;
   unlockApp: (app: AppId) => void;
@@ -31,6 +33,7 @@ const DEFAULT_APPS: AppId[] = ["my-computer", "inbox", "case-files", "sql-exe", 
 const INITIAL = {
   phase: "idle" as GamePhase,
   currentCaseId: null,
+  caseConfig: null as CaseConfig | null,
   discoveredClues: [] as string[],
   completedObjectives: [] as string[],
   unlockedApps: DEFAULT_APPS,
@@ -43,13 +46,16 @@ const INITIAL = {
 export const useGameStore = create<GameStore>((set, get) => ({
   ...INITIAL,
 
-  offerCase: (caseId) =>
-    set((s) => (s.phase === "idle" ? { phase: "offered", currentCaseId: caseId } : s)),
+  offerCase: (caseId, config) =>
+    set((s) =>
+      s.phase === "idle" ? { phase: "offered", currentCaseId: caseId, caseConfig: config } : s,
+    ),
 
-  startCase: (caseId) =>
+  startCase: (caseId, config) =>
     set({
       phase: "investigating",
       currentCaseId: caseId,
+      caseConfig: config,
       discoveredClues: [],
       completedObjectives: [],
       sqlUnlocked: false,

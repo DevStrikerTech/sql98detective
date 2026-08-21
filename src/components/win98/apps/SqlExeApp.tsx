@@ -3,7 +3,6 @@ import { cn } from "@/lib/utils";
 import { Win98Button } from "../Win98Button";
 import { Win98Icon } from "../Win98Icon";
 import { createSqlEngine, type SqlOutcome } from "@/lib/game/sqlEngine";
-import { proofBrief, revealScript, sqlTable, warrantScript } from "@/content/case001";
 import { useGameStore } from "@/lib/game/gameStore";
 import { useShellStore } from "@/lib/game/shellStore";
 
@@ -14,6 +13,7 @@ const BOOT_LINES = [
 
 export function SqlExeApp() {
   const phase = useGameStore((s) => s.phase);
+  const caseConfig = useGameStore((s) => s.caseConfig);
   const sqlUnlocked = useGameStore((s) => s.sqlUnlocked);
   const hintsUsed = useGameStore((s) => s.hintsUsed);
   const discoveredCount = useGameStore((s) => s.discoveredClues.length);
@@ -24,7 +24,10 @@ export function SqlExeApp() {
   const playCue = useShellStore((s) => s.playCue);
   const fireScreenFx = useShellStore((s) => s.fireScreenFx);
 
-  const { runQuery, hints } = useMemo(() => createSqlEngine(sqlTable), []);
+  const { runQuery, hints } = useMemo(
+    () => (caseConfig ? createSqlEngine(caseConfig.sqlTable) : { runQuery: () => null, hints: [] }),
+    [caseConfig],
+  );
 
   const [query, setQuery] = useState("SELECT username\nFROM file_access_logs\nWHERE ");
   const [lines, setLines] = useState<string[]>([...BOOT_LINES, "", "READY."]);
@@ -49,16 +52,16 @@ export function SqlExeApp() {
 
   // First time the warrant lands, the console reads itself in. Ceremony, one line at a time.
   useEffect(() => {
-    if (!sqlUnlocked || warrantDone.current) return;
+    if (!sqlUnlocked || warrantDone.current || !caseConfig) return;
     warrantDone.current = true;
     setLines([...BOOT_LINES, ""]);
-    warrantScript.forEach((l, i) => {
+    caseConfig.warrantScript.forEach((l, i) => {
       timers.current.push(
         window.setTimeout(
           () => {
             setLines((prev) => [...prev, l]);
             if (l) playCue("query");
-            if (i === warrantScript.length - 1) {
+            if (i === caseConfig.warrantScript.length - 1) {
               setLines((prev) => [...prev, "", "READY."]);
               setStatus("WARRANT ACTIVE — AWAITING QUERY");
             }
@@ -67,7 +70,7 @@ export function SqlExeApp() {
         ),
       );
     });
-  }, [sqlUnlocked, playCue]);
+  }, [sqlUnlocked, playCue, caseConfig]);
 
   if (!sqlUnlocked) {
     return (
@@ -97,7 +100,7 @@ export function SqlExeApp() {
   const push = (s: string) => setLines((l) => [...l, s]);
 
   const execute = () => {
-    if (running) return;
+    if (running || !caseConfig) return;
     if (!query.trim()) {
       playCue("error");
       setStatus("NO QUERY ENTERED");
@@ -125,6 +128,7 @@ export function SqlExeApp() {
       window.setTimeout(
         () => {
           const outcome = runQuery(query);
+          if (!outcome) return;
           setResult(outcome);
           setRunning(false);
           setStatus(outcome.statusText);
@@ -191,21 +195,26 @@ export function SqlExeApp() {
         <span className="ml-auto pr-1 text-[11px] text-ink-disabled">Table: file_access_logs</span>
       </div>
 
-      <div className="win98-groove shrink-0 bg-surface px-2 py-1 text-[11px]">
-        <b>INVESTIGATION QUERY:</b> Find the user who deleted payroll.xls.
-      </div>
-
-      {/* Suspicion on the left, proof on the right. The gap between them is the game. */}
-      <div className="win98-groove grid shrink-0 grid-cols-2 gap-[3px] bg-surface p-[3px]">
-        {proofBrief.map((b) => (
-          <div key={b.heading} className="win98-field px-2 py-1">
-            <div className="text-[11px] font-bold tracking-[0.14em] text-ink-disabled">
-              {b.heading}
-            </div>
-            <div className="text-[11px] leading-[1.4] text-ink">{b.line}</div>
+      {caseConfig && (
+        <>
+          <div className="win98-groove shrink-0 bg-surface px-2 py-1 text-[11px]">
+            <b>INVESTIGATION QUERY:</b>{" "}
+            {caseConfig.id === "001" ? "Find the user who deleted payroll.xls." : "Solve the case."}
           </div>
-        ))}
-      </div>
+
+          {/* Suspicion on the left, proof on the right. The gap between them is the game. */}
+          <div className="win98-groove grid shrink-0 grid-cols-2 gap-[3px] bg-surface p-[3px]">
+            {caseConfig.proofBrief.map((b) => (
+              <div key={b.heading} className="win98-field px-2 py-1">
+                <div className="text-[11px] font-bold tracking-[0.14em] text-ink-disabled">
+                  {b.heading}
+                </div>
+                <div className="text-[11px] leading-[1.4] text-ink">{b.line}</div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
       <div className="shrink-0">
         <label className="mb-[3px] flex items-center justify-between text-[11px] text-ink">
@@ -275,14 +284,14 @@ export function SqlExeApp() {
           </table>
         )}
 
-        {result?.correct && revealStep > 0 && (
+        {result?.correct && revealStep > 0 && caseConfig && (
           <div className="mt-3 border-t border-terminal-ink/40 pt-2">
-            {revealScript.slice(0, revealStep).map((t, i) => (
+            {caseConfig.revealScript.slice(0, revealStep).map((t, i) => (
               <div
                 key={t}
                 className={cn(
                   "anim-typeout",
-                  i === revealScript.length - 1 &&
+                  i === caseConfig.revealScript.length - 1 &&
                     "mt-1 anim-flicker text-[13px] font-bold tracking-[0.12em]",
                 )}
               >
@@ -308,18 +317,21 @@ export function SqlExeApp() {
         >
           {status}
         </div>
-        {result?.correct && revealStep >= revealScript.length && phase !== "solved" && (
-          <Win98Button
-            className="anim-pulse-border font-bold tracking-[0.1em]"
-            onClick={() => {
-              solveCase();
-              playCue("solved");
-              fireScreenFx("flicker");
-            }}
-          >
-            ACCUSE KEVIN
-          </Win98Button>
-        )}
+        {result?.correct &&
+          caseConfig &&
+          revealStep >= caseConfig.revealScript.length &&
+          phase !== "solved" && (
+            <Win98Button
+              className="anim-pulse-border font-bold tracking-[0.1em]"
+              onClick={() => {
+                solveCase();
+                playCue("solved");
+                fireScreenFx("flicker");
+              }}
+            >
+              {caseConfig.id === "001" ? "ACCUSE KEVIN" : "SUBMIT FINDING"}
+            </Win98Button>
+          )}
       </div>
     </div>
   );

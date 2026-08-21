@@ -3,13 +3,14 @@ import { cn } from "@/lib/utils";
 import { Win98Icon } from "../Win98Icon";
 import { Win98Button } from "../Win98Button";
 import { emails, type Mail } from "@/content/emails";
-import { CASE_ID, caseEmail, caseFollowUps, mailActions, mailRoomChatter } from "@/content/case001";
+import { mailActions, mailRoomChatter, caseEmail, caseFollowUps } from "@/content/case001";
 import { useGameStore } from "@/lib/game/gameStore";
 import { useShellStore } from "@/lib/game/shellStore";
 import { useWindowStore } from "@/lib/win98/windowStore";
 
 export function InboxApp() {
   const phase = useGameStore((s) => s.phase);
+  const caseConfig = useGameStore((s) => s.caseConfig);
   const sqlUnlocked = useGameStore((s) => s.sqlUnlocked);
   const startCase = useGameStore((s) => s.startCase);
   const showDialog = useShellStore((s) => s.showDialog);
@@ -21,22 +22,28 @@ export function InboxApp() {
 
   const list: Mail[] = useMemo(() => {
     if (phase === "idle") return emails;
-    const extras = caseFollowUps
-      .filter((f) => {
-        if (f.showAfter === "accepted") return accepted;
-        if (f.showAfter === "sql") return sqlUnlocked;
-        return phase === "solved";
-      })
-      .map(({ showAfter: _showAfter, ...m }) => m as Mail);
-    return [...extras.slice().reverse(), caseEmail, ...emails];
-  }, [phase, accepted, sqlUnlocked]);
+    if (!caseConfig) return emails;
+
+    if (caseConfig.id === "001") {
+      const extras = caseFollowUps
+        .filter((f) => {
+          if (f.showAfter === "accepted") return accepted;
+          if (f.showAfter === "sql") return sqlUnlocked;
+          return phase === "solved";
+        })
+        .map(({ showAfter: _showAfter, ...m }) => m as Mail);
+      return [...extras.slice().reverse(), caseEmail, ...emails];
+    }
+
+    return emails;
+  }, [phase, accepted, sqlUnlocked, caseConfig]);
 
   const [selectedId, setSelectedId] = useState<string>(list[0]!.id);
   const [read, setRead] = useState<string[]>([]);
 
   useEffect(() => {
-    if (phase === "offered") setSelectedId(caseEmail.id);
-  }, [phase]);
+    if (phase === "offered" && caseConfig?.id === "001") setSelectedId(caseEmail.id);
+  }, [phase, caseConfig?.id]);
 
   useEffect(() => {
     setRead((r) => (r.includes(selectedId) ? r : [...r, selectedId]));
@@ -63,21 +70,21 @@ export function InboxApp() {
   }, [list, seen, playCue]);
 
   const mail = list.find((m) => m.id === selectedId) ?? list[0]!;
-  const isCaseMail = mail.id === caseEmail.id;
+  const isCaseMail = caseConfig?.id === "001" && mail.id === caseEmail.id;
   const unreadCount = list.filter((m) => !read.includes(m.id)).length;
 
   const accept = () => {
-    startCase(CASE_ID);
+    if (!caseConfig) return;
+    startCase(caseConfig.id, caseConfig);
     playCue("evidence");
     openWindow("case-files");
     showDialog({
       title: "Case Assigned",
-      message:
-        "CASE 001 — THE MISSING SPREADSHEET has been added to your Case Files.\n\nThree names. One deleted file. One morning.\n\nObjective: determine who deleted payroll.xls.",
+      message: `CASE ${caseConfig.id} — ${caseConfig.title} has been added to your Case Files.\n\nObjective: investigate and solve the case.`,
       icon: "case-files",
       okLabel: "Get to work",
     });
-    say("Investigation opened. Try the computer itself — files remember things people forget.");
+    say("Investigation opened. Follow the leads.");
   };
 
   return (
@@ -129,7 +136,7 @@ export function InboxApp() {
           </thead>
           <tbody>
             {list.map((m) => {
-              const urgent = m.id === caseEmail.id && !accepted;
+              const urgent = caseConfig?.id === "001" && m.id === caseEmail.id && !accepted;
               const unread = !read.includes(m.id);
               return (
                 <tr
