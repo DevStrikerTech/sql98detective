@@ -193,7 +193,7 @@ export function LeadsInvestigation({ caseConfig }: { caseConfig: CaseConfig }) {
                         {working && (
                           <div className="mt-1 flex items-center gap-2">
                             <div className="win98-in h-[10px] w-[110px] bg-field p-[1px]">
-                              <div className="anim-marquee-bar h-full w-[34px] bg-title" />
+                              <div className="win98-marquee-bar h-full bg-title" />
                             </div>
                             <span className="text-[10px] tracking-[0.14em] text-ink-disabled">
                               WORKING THE LEAD...
