@@ -373,3 +373,25 @@ export const caseFollowUps: {
     showAfter: "solved",
   },
 ];
+
+/** Where each record sits on the morning's timeline, 09:10 → 09:25. */
+export const TIMELINE_START = 9 * 60 + 10;
+export const TIMELINE_END = 9 * 60 + 25;
+
+/** Cross-references the detective would scribble in the margin once two records line up. */
+export const logCrossRefs: Record<number, string> = {
+  2: "CROSS-REF #1: opened 09:11, closed 09:15. Four tidy minutes. The file survived her.",
+  3: "CROSS-REF: 8,102 KB on this connection takes the better part of a morning. Gary was occupied.",
+  4: "CROSS-REF #2: exactly two minutes after Linda signed off. Somebody waited for the desk to clear.",
+  5: "CROSS-REF #4: OPEN and DELETE in the same minute. Nobody reads a spreadsheet that fast.",
+  6: "CROSS-REF #5: system.log opened two minutes later. Someone checking whether the machine noticed.",
+};
+
+/** Idle mutterings from QUERY.hlp while the detective works. */
+export const assistantBarks: string[] = [
+  "The machine does not have a favourite suspect. That is your job.",
+  "Every file on this drive has an alibi. Only one of them is nervous.",
+  "Tip: two records next to each other are worth more than either alone.",
+  "Somewhere in this building a fax machine is dialling nobody.",
+  "The Chief has walked past your desk again. Slowly.",
+];

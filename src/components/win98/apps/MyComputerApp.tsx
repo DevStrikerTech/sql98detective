@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { Win98Icon } from "../Win98Icon";
 import { Win98Button } from "../Win98Button";
 import { clues, fileSystem, precinctChatter, type FsNode } from "@/content/case001";
+import type { ClueId } from "@/content/case001";
 
 import { useGameStore } from "@/lib/game/gameStore";
 import { useShellStore } from "@/lib/game/shellStore";
@@ -26,7 +27,8 @@ export function MyComputerApp() {
   const playCue = useShellStore((s) => s.playCue);
   const logEvidence = useShellStore((s) => s.logEvidence);
   const fireScreenFx = useShellStore((s) => s.fireScreenFx);
-  const discoveredCount = useGameStore((s) => s.discoveredClues.length);
+  const discoveredClues = useGameStore((s) => s.discoveredClues);
+  const discoveredCount = discoveredClues.length;
   const openWindow = useWindowStore((s) => s.open);
 
   const items = path.length === 0 ? fileSystem : (path[path.length - 1]!.children ?? []);
@@ -147,8 +149,16 @@ export function MyComputerApp() {
               type="button"
               onClick={() => setSel(d.name)}
               onDoubleClick={() => openNode(d)}
-              className="flex w-[112px] flex-col items-center gap-1 p-2 text-center"
+              className="relative flex w-[112px] flex-col items-center gap-1 p-2 text-center"
             >
+              {clueForNode(d) && discoveredClues.includes(clueForNode(d)!) && (
+                <span
+                  className="anim-stamp pointer-events-none absolute top-[4px] right-[2px] border border-destructive px-[2px] text-[9px] leading-[1.2] font-bold tracking-[0.1em] text-destructive"
+                  style={{ transform: "rotate(-9deg)" }}
+                >
+                  LOGGED
+                </span>
+              )}
               <span className={cn(d.missing && "opacity-40 anim-blink")}>
                 <Win98Icon name={d.icon} size={32} />
               </span>
@@ -176,4 +186,11 @@ export function MyComputerApp() {
       </div>
     </div>
   );
+}
+
+/** Which clue, if any, a file on this drive stands for. Presentation only. */
+function clueForNode(node: FsNode): ClueId | null {
+  if (node.action === "inspect-payroll") return "payroll-missing";
+  if (node.action === "open-logs") return "access-logs";
+  return null;
 }
