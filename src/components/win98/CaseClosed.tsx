@@ -73,7 +73,7 @@ export function CaseClosed({ onDismiss }: { onDismiss: () => void }) {
           <div className="mb-3 text-[15px] font-bold tracking-wide text-ink">{CASE_TITLE}</div>
 
           {report.slice(0, rows).map(([label, value, bold]) => (
-            <Row key={label} label={label} value={value} bold={bold} />
+            <Row key={label} label={label} value={value} bold={bold ?? false} />
           ))}
           {rows < report.length && (
             <div className="py-[3px] text-[11px] text-ink-disabled">
@@ -105,7 +105,7 @@ export function CaseClosed({ onDismiss }: { onDismiss: () => void }) {
   );
 }
 
-function Row({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
+function Row({ label, value, bold }: { label: string; value: string; bold: boolean }) {
   return (
     <div className="anim-typeout flex gap-2 border-b border-dotted border-surface-shadow py-[3px] text-[11px]">
       <span className="w-[130px] shrink-0 tracking-[0.1em] text-ink-disabled">{label}</span>

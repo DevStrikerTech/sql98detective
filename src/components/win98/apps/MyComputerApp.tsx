@@ -49,7 +49,7 @@ export function MyComputerApp() {
     playCue("evidence");
     logEvidence({
       label: clue?.label ?? "New evidence",
-      detail: clue?.detail,
+      detail: clue?.detail ?? "",
       index: Math.min(discoveredCount + 1, clues.length),
       total: clues.length,
     });
