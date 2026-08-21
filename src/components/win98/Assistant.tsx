@@ -33,12 +33,17 @@ export function Assistant() {
   lineRef.current = line;
   useEffect(() => {
     if (phase === "idle" || phase === "offered" || phase === "solved") return;
+    // Shuffled once, so QUERY never repeats itself twice in a row.
+    const order = assistantBarks
+      .map((t, i) => ({ t, k: (i * 7919 + Date.now()) % 1000 }))
+      .sort((a, b) => a.k - b.k)
+      .map((x) => x.t);
     let n = 0;
     const id = window.setInterval(() => {
-      if (lineRef.current) return;
-      say(assistantBarks[n % assistantBarks.length]!);
+      if (lineRef.current || document.hidden) return;
+      say(order[n % order.length]!);
       n += 1;
-    }, 42000);
+    }, 36000);
     return () => window.clearInterval(id);
   }, [phase, say]);
 
