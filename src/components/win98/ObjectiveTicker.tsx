@@ -53,6 +53,12 @@ export function ObjectiveTicker() {
               <span className="anim-blink mr-1 font-bold">▸</span>
               {obj.text}
             </div>
+            {(sqlUnlocked || phase === "revealed") && phase !== "solved" && (
+              <div className="mt-1 win98-in bg-field px-[5px] py-[1px] text-[11px] font-bold tracking-[0.14em] text-ink">
+                <span className="anim-blink">●</span>{" "}
+                {phase === "revealed" ? "NAME IN HAND — CLOSE IT" : "CLOSING IN — PROOF PENDING"}
+              </div>
+            )}
             <div className="mt-1 flex items-center justify-between gap-2 text-[11px] tracking-[0.1em] text-ink-disabled">
               <span>LOCATION: {obj.where.toUpperCase()}</span>
               <span className="font-bold text-ink">
