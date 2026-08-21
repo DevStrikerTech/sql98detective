@@ -126,8 +126,11 @@ export function Desktop() {
     if (introAudioRef.current) introAudioRef.current.currentTime = 0;
     setIntroMusicPlaying(false);
     setShowFirstRunGuide(false);
-    if (phase === "offered") open("inbox");
-  }, [open, phase]);
+    // Do not open inbox directly here. useCaseFlow's "PRIORITY MESSAGE"
+    // dialog is already in state (hidden behind the guide overlay at z-9300).
+    // Clearing the guide lets it surface — the player then clicks OPEN INBOX
+    // themselves, preserving the intended onboarding beat.
+  }, []);
 
   const startBriefing = useCallback(() => {
     const audio = introAudioRef.current;
