@@ -1,13 +1,12 @@
 import { create } from "zustand";
 import type { AppId } from "@/lib/win98/windowStore";
-import type { ClueId } from "@/content/case001";
 
 export type GamePhase = "idle" | "offered" | "investigating" | "revealed" | "solved";
 
 export type GameStore = {
   phase: GamePhase;
   currentCaseId: string | null;
-  discoveredClues: ClueId[];
+  discoveredClues: string[];
   completedObjectives: string[];
   unlockedApps: AppId[];
   sqlUnlocked: boolean;
@@ -17,7 +16,7 @@ export type GameStore = {
 
   offerCase: (caseId: string) => void;
   startCase: (caseId: string) => void;
-  discoverClue: (clueId: ClueId) => boolean;
+  discoverClue: (clueId: string) => boolean;
   completeObjective: (objectiveId: string) => void;
   unlockApp: (app: AppId) => void;
   unlockSql: () => void;
@@ -32,7 +31,7 @@ const DEFAULT_APPS: AppId[] = ["my-computer", "inbox", "case-files", "sql-exe", 
 const INITIAL = {
   phase: "idle" as GamePhase,
   currentCaseId: null,
-  discoveredClues: [] as ClueId[],
+  discoveredClues: [] as string[],
   completedObjectives: [] as string[],
   unlockedApps: DEFAULT_APPS,
   sqlUnlocked: false,
@@ -53,7 +52,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentCaseId: caseId,
       discoveredClues: [],
       completedObjectives: [],
+      sqlUnlocked: false,
+      hintsUsed: 0,
       startedAt: Date.now(),
+      finishedAt: null,
     }),
 
   discoverClue: (clueId) => {
