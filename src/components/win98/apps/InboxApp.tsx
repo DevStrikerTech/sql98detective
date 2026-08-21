@@ -74,13 +74,23 @@ export function InboxApp() {
     startCase(caseConfig.id, caseConfig);
     playCue("evidence");
     openWindow("case-files");
+    const legwork = !!caseConfig.leads;
     showDialog({
       title: "Case Assigned",
-      message: `CASE ${caseConfig.id} — ${caseConfig.title} has been added to your Case Files.\n\n${caseConfig.assignment.acceptSummary}`,
+      message:
+        `CASE ${caseConfig.id} — ${caseConfig.title} has been added to your Case Files.\n\n` +
+        `${caseConfig.assignment.acceptSummary}` +
+        (legwork
+          ? "\n\nNo drives to dig through on this one. Open CASE FILES and work the lead board, top to bottom."
+          : ""),
       icon: "case-files",
       okLabel: "Get to work",
     });
-    say("Investigation opened. Follow the leads.");
+    say(
+      legwork
+        ? "Case Files is open. Work the lead board, top to bottom."
+        : "Investigation opened. Follow the leads.",
+    );
   };
 
   return (

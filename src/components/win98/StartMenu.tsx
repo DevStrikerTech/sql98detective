@@ -46,12 +46,6 @@ export function StartMenu({
     { label: "Run...", icon: "sql-exe", action: () => onNotImplemented("Run") },
   ];
 
-  const caseItems: Item[] = cases.map((c) => ({
-    label: `Case ${c.id} — ${c.title}`,
-    icon: "case-files",
-    action: () => onLoadCase(c.id),
-  }));
-
   return (
     <div className="win98-out anim-snap-open absolute bottom-[28px] left-0 z-[8600] flex w-[240px] bg-surface p-[3px]">
       <div className="win98-titlebar-active flex w-[22px] shrink-0 items-end justify-center pb-3">
@@ -67,12 +61,27 @@ export function StartMenu({
           <MenuRow key={item.label} item={item} onRun={run} />
         ))}
         <div className="my-[3px] border-t border-surface-shadow border-b border-b-surface-hilite" />
-        <div className="px-[6px] pb-[2px] text-[10px] font-bold tracking-[0.14em] text-ink-disabled">
-          LOAD CASE
+        <div className="flex items-center gap-1 px-[6px] pb-[2px] text-[10px] font-bold tracking-[0.14em] text-ink-disabled">
+          <Win98Icon name="case-files" size={12} />
+          <span>PRECINCT CASE ARCHIVE</span>
         </div>
-        {caseItems.map((item) => (
-          <MenuRow key={item.label} item={item} onRun={run} />
+        {cases.map((c) => (
+          <button
+            key={c.id}
+            type="button"
+            onClick={run(() => onLoadCase(c.id))}
+            className="group flex w-full items-center gap-2 px-[6px] py-[3px] text-left hover:bg-select hover:text-select-ink"
+          >
+            <Win98Icon name="case-files" size={20} />
+            <span className="win98-groove shrink-0 bg-surface px-[3px] text-[10px] font-bold tracking-[0.1em] text-ink">
+              {c.id}
+            </span>
+            <span className="flex-1 truncate text-[11px]">{c.title}</span>
+          </button>
         ))}
+        <div className="px-[6px] pb-[2px] text-[10px] text-ink-disabled italic">
+          Drawer sticks. Pull firmly.
+        </div>
         <div className="my-[3px] border-t border-surface-shadow border-b border-b-surface-hilite" />
         <MenuRow
           item={{ label: "Shut Down...", icon: "shutdown", action: onShutdown }}

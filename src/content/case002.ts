@@ -123,6 +123,17 @@ export const caseConfig: CaseConfig = {
     "The printer never lies. It just keeps receipts.",
     "Two people opened the file. Only one printed it.",
     "Reading a file is not the same as printing it. The log knows the difference.",
+    "PRN2 is jammed again. Not evidence. Just Tuesday.",
+    "Someone has taped a sign to the printer. It says PLEASE.",
+  ],
+
+  leadsChatter: [
+    "PRN2 status: ONLINE, RESENTFUL.",
+    "Toner low. Toner has been low since March.",
+    "The out-tray now has its own coffee ring.",
+    "Derek has walked past the printer four times without looking at it.",
+    "Somebody in Finance is refreshing the print queue like it will confess.",
+    "Nineteen pages. Still warm. Still nobody's.",
   ],
 
   leads: [
