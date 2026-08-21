@@ -464,3 +464,33 @@ export const dossierChatter: string[] = [
   "Carbon copy filed with Records. Records lost it.",
   "Typewriter ribbon low. Press harder.",
 ];
+
+/**
+ * Interview-room observations the detective adds to a suspect card once a given
+ * exhibit is filed. Flavour and pressure only — never names the culprit.
+ */
+export const suspectObservations: Record<string, Partial<Record<ClueId, string>>> = {
+  linda: {
+    "payroll-missing": "Asked, unprompted, whether the file was 'properly' deleted or 'just' deleted.",
+    "access-logs": "Her account of the morning matches the machine, minute for minute. Rare.",
+    "kevin-timing": "Has gone very quiet, in the manner of someone who was right all along.",
+  },
+  kevin: {
+    "payroll-missing": "Volunteered that spreadsheets 'corrupt themselves all the time'. Nobody asked.",
+    "access-logs": "Wanted to know whether logs can be 'rounded to the nearest hour'. They cannot.",
+    "kevin-timing": "Stopped mid-sentence. Then asked where the break room was, as if new here.",
+  },
+  gary: {
+    "payroll-missing": "Offered an alibi before being told what for. Offered two, actually.",
+    "access-logs": "Very keen for us to look at the logs. Which is itself a kind of alibi.",
+    "kevin-timing": "Delighted. Has begun telling people. Told the fern.",
+  },
+};
+
+/** How hot the case feels, indexed by exhibits filed. Atmosphere, not logic. */
+export const caseHeat: { label: string; line: string }[] = [
+  { label: "COLD", line: "Three stories, no receipts. Nothing to press on yet." },
+  { label: "WARM", line: "The file's last minute is on record. Somebody's morning just got shorter." },
+  { label: "HOT", line: "The machine kept the whole morning. Stories are starting to rub." },
+  { label: "AIRTIGHT", line: "Every exhibit filed. One account no longer survives the log." },
+];
