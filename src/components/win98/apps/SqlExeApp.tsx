@@ -16,6 +16,7 @@ export function SqlExeApp() {
   const phase = useGameStore((s) => s.phase);
   const sqlUnlocked = useGameStore((s) => s.sqlUnlocked);
   const hintsUsed = useGameStore((s) => s.hintsUsed);
+  const discoveredCount = useGameStore((s) => s.discoveredClues.length);
   const consumeHint = useGameStore((s) => s.useHint);
   const revealCulprit = useGameStore((s) => s.revealCulprit);
   const solveCase = useGameStore((s) => s.solveCase);
@@ -78,6 +79,11 @@ export function SqlExeApp() {
             ? "No active investigation."
             : "Hint: the machine keeps logs. C:\\OFFICE\\LOGS\\"}
         </div>
+        {phase !== "idle" && phase !== "offered" && (
+          <div className="win98-in bg-terminal px-3 py-1 text-[12px] tracking-[0.14em]">
+            EXHIBITS SECURED {discoveredCount} — WARRANT PENDING
+          </div>
+        )}
         <div className="mt-2 text-[12px]">
           {"C:\\PRECINCT>"} <span className="anim-blink">_</span>
         </div>
