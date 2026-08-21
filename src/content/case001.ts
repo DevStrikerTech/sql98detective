@@ -499,3 +499,29 @@ export const caseHeat: { label: string; line: string }[] = [
   { label: "HOT", line: "The machine kept the whole morning. Stories are starting to rub." },
   { label: "AIRTIGHT", line: "Every exhibit filed. One account no longer survives the log." },
 ];
+
+/**
+ * Typed out in SQL.exe the first time the query engine comes online.
+ * Ceremony, not instruction — the moment suspicion is allowed to become proof.
+ */
+export const warrantScript: string[] = [
+  "ESTABLISHING LINK TO EVIDENCE.MDB . . . OK",
+  `CASE ${CASE_ID} — ${CASE_TITLE}`,
+  "AUTHORISATION: Chief Brannigan (verbal, loud)",
+  "PRIVILEGE GRANTED: READ file_access_logs",
+  "",
+  "The room has run out of stories. The log has not.",
+  "Ask it one clean question.",
+];
+
+/** Case-brief strip above the query box. Pressure, never answers. */
+export const proofBrief: { heading: string; line: string }[] = [
+  {
+    heading: "SUSPICION",
+    line: "Three statements. Three people certain of themselves.",
+  },
+  {
+    heading: "PROOF",
+    line: "One table that was in the room and cannot be embarrassed.",
+  },
+];
