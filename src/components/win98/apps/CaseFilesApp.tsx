@@ -5,9 +5,11 @@ import { cn } from "@/lib/utils";
 import {
   CASE_ID,
   CASE_TITLE,
+  caseHeat,
   clueNotes,
   clues,
   dossierChatter,
+  suspectObservations,
   suspects,
   type ClueId,
 } from "@/content/case001";
@@ -63,6 +65,11 @@ export function CaseFilesApp({ onRequest }: { onRequest: (what: string) => void 
     sqlUnlocked,
   });
 
+  const brokenCount = suspects.filter(
+    (s) => !!s.contradictedBy && discovered.includes(s.contradictedBy),
+  ).length;
+  const heat = caseHeat[Math.min(discovered.length, caseHeat.length - 1)] ?? caseHeat[0]!;
+
   const tabs: [Tab, string][] = [
     ["dossier", "Dossier"],
     ["suspects", "Suspects"],
@@ -90,6 +97,9 @@ export function CaseFilesApp({ onRequest }: { onRequest: (what: string) => void 
               {label}
               {id === "evidence" && unread > 0 && tab !== "evidence" && (
                 <span className="anim-blink ml-1 font-bold text-destructive">NEW</span>
+              )}
+              {id === "suspects" && brokenCount > 0 && tab !== "suspects" && (
+                <span className="anim-blink ml-1 font-bold text-destructive">!</span>
               )}
             </button>
           ))}
@@ -163,6 +173,40 @@ export function CaseFilesApp({ onRequest }: { onRequest: (what: string) => void 
                   </div>
                 </Section>
 
+                <Section label={`CASE TEMPERATURE — ${heat.label}`}>
+                  <div className="win98-groove flex items-center gap-2 bg-surface p-2">
+                    <div className="flex gap-[2px]">
+                      {clues.map((c, i) => (
+                        <span
+                          key={c.id}
+                          className={cn(
+                            "win98-in h-[14px] w-[9px]",
+                            i < discovered.length
+                              ? i >= clues.length - 1
+                                ? "anim-blink bg-destructive"
+                                : "bg-title"
+                              : "bg-field",
+                          )}
+                        />
+                      ))}
+                    </div>
+                    <div className="min-w-0 flex-1 text-[11px] leading-[1.5] text-ink">
+                      {heat.line}
+                    </div>
+                  </div>
+                  {brokenCount > 0 && (
+                    <div className="anim-redraw mt-1 text-[11px] font-bold text-destructive">
+                      <span className="anim-blink mr-1">!</span>
+                      {brokenCount} statement(s) no longer survive the record. See Suspects.
+                    </div>
+                  )}
+                  {sqlUnlocked && (
+                    <div className="anim-redraw mt-1 text-[11px] text-ink">
+                      Query access is live. The log will answer, but only in SQL.
+                    </div>
+                  )}
+                </Section>
+
                 {latestNote && (
                   <Section label="LAST ENTRY IN THE NOTEBOOK">
                     <div className="win98-groove bg-surface p-2">
@@ -194,6 +238,11 @@ export function CaseFilesApp({ onRequest }: { onRequest: (what: string) => void 
               <div className="anim-redraw mt-2 space-y-2">
                 {suspects.map((s) => {
                   const busted = !!s.contradictedBy && discovered.includes(s.contradictedBy);
+                  const notes = suspectObservations[s.id] ?? {};
+                  const observed = clues
+                    .filter((c) => discovered.includes(c.id))
+                    .map((c) => notes[c.id])
+                    .filter((n): n is string => !!n);
                   return (
                     <div key={s.id} className="win98-groove relative bg-surface p-2">
                       <div className="flex gap-2">
@@ -222,6 +271,51 @@ export function CaseFilesApp({ onRequest }: { onRequest: (what: string) => void 
                           <div className="text-[11px] text-ink-disabled">
                             <b className="text-ink">NOTE:</b> {s.tell}
                           </div>
+
+                          <div className="mt-[6px] flex items-center gap-2">
+                            <span className="text-[11px] tracking-[0.1em] text-ink-disabled">
+                              PRESSURE
+                            </span>
+                            <div className="win98-in flex h-[10px] flex-1 gap-[1px] bg-field p-[1px]">
+                              {clues.map((c, i) => (
+                                <span
+                                  key={c.id}
+                                  className={cn(
+                                    "flex-1",
+                                    i < observed.length
+                                      ? busted
+                                        ? "bg-destructive"
+                                        : "bg-title"
+                                      : "bg-transparent",
+                                  )}
+                                />
+                              ))}
+                            </div>
+                            <span
+                              className={cn(
+                                "text-[11px] font-bold",
+                                busted ? "text-destructive" : "text-ink-disabled",
+                              )}
+                            >
+                              {observed.length}/{clues.length}
+                            </span>
+                          </div>
+
+                          {observed.length > 0 && (
+                            <div className="win98-in anim-redraw mt-1 bg-field p-[5px]">
+                              <div className="mb-[2px] text-[11px] tracking-[0.1em] text-ink-disabled">
+                                INTERVIEW ROOM — OBSERVED
+                              </div>
+                              {observed.map((line, i) => (
+                                <div
+                                  key={i}
+                                  className="border-l-2 border-surface-shadow pl-2 text-[11px] leading-[1.5] text-ink"
+                                >
+                                  {line}
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
                       {busted && (
