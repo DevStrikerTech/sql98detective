@@ -19,6 +19,8 @@ import { useWindowStore } from "@/lib/win98/windowStore";
 export function LogViewerApp() {
   const [sel, setSel] = useState<number | null>(null);
   const [examined, setExamined] = useState<number[]>([]);
+  /** A WHERE clause with a mouse. Same idea the player will type later. */
+  const [payrollOnly, setPayrollOnly] = useState(false);
   const phase = useGameStore((s) => s.phase);
   const discoverClue = useGameStore((s) => s.discoverClue);
   const sqlUnlocked = useGameStore((s) => s.sqlUnlocked);
