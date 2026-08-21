@@ -45,6 +45,25 @@ export function SqlExeApp() {
     outRef.current?.scrollTo({ top: outRef.current.scrollHeight });
   }, [lines, result]);
 
+  // First time the warrant lands, the console reads itself in. Ceremony, one line at a time.
+  useEffect(() => {
+    if (!sqlUnlocked || warrantDone.current) return;
+    warrantDone.current = true;
+    setLines([...BOOT_LINES, ""]);
+    warrantScript.forEach((l, i) => {
+      timers.current.push(
+        window.setTimeout(() => {
+          setLines((prev) => [...prev, l]);
+          if (l) playCue("query");
+          if (i === warrantScript.length - 1) {
+            setLines((prev) => [...prev, "", "READY."]);
+            setStatus("WARRANT ACTIVE — AWAITING QUERY");
+          }
+        }, 260 + i * 340),
+      );
+    });
+  }, [sqlUnlocked, playCue]);
+
   if (!sqlUnlocked) {
     return (
       <div className="win98-in flex min-h-0 flex-1 flex-col items-center justify-center gap-3 bg-terminal p-6 text-center font-mono text-terminal-ink">
