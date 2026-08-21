@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { Win98Button } from "../Win98Button";
 import { Win98Icon } from "../Win98Icon";
 import { createSqlEngine, type SqlOutcome } from "@/lib/game/sqlEngine";
-import { revealScript, sqlTable } from "@/content/case001";
+import { proofBrief, revealScript, sqlTable, warrantScript } from "@/content/case001";
 import { useGameStore } from "@/lib/game/gameStore";
 import { useShellStore } from "@/lib/game/shellStore";
 
@@ -33,6 +33,7 @@ export function SqlExeApp() {
   const [revealStep, setRevealStep] = useState(0);
   const outRef = useRef<HTMLDivElement>(null);
   const timers = useRef<number[]>([]);
+  const warrantDone = useRef(false);
 
   useEffect(
     () => () => {
@@ -173,6 +174,18 @@ export function SqlExeApp() {
 
       <div className="win98-groove shrink-0 bg-surface px-2 py-1 text-[11px]">
         <b>INVESTIGATION QUERY:</b> Find the user who deleted payroll.xls.
+      </div>
+
+      {/* Suspicion on the left, proof on the right. The gap between them is the game. */}
+      <div className="win98-groove grid shrink-0 grid-cols-2 gap-[3px] bg-surface p-[3px]">
+        {proofBrief.map((b) => (
+          <div key={b.heading} className="win98-field px-2 py-1">
+            <div className="text-[11px] font-bold tracking-[0.14em] text-ink-disabled">
+              {b.heading}
+            </div>
+            <div className="text-[11px] leading-[1.4] text-ink">{b.line}</div>
+          </div>
+        ))}
       </div>
 
       <div className="shrink-0">
