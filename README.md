@@ -44,7 +44,3 @@ Useful checks:
 npm run lint
 npm run build
 ```
-
-## Project Status
-
-This is an MVP showcase build. Case 001 is the primary polished path, and Case 002 proves the game can support additional cases without rebuilding the desktop shell.
