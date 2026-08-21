@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { DesktopIcon } from "./DesktopIcon";
 import { DesktopWindow } from "./DesktopWindow";
 import { Taskbar } from "./Taskbar";
@@ -9,6 +9,7 @@ import { CaseClosed } from "./CaseClosed";
 import { EvidenceToast } from "./EvidenceToast";
 import { ObjectiveTicker } from "./ObjectiveTicker";
 import { ScreenFxLayer } from "./ScreenFxLayer";
+import { FirstRunGuide } from "./FirstRunGuide";
 import { MyComputerApp } from "./apps/MyComputerApp";
 import { InboxApp } from "./apps/InboxApp";
 import { CaseFilesApp } from "./apps/CaseFilesApp";
@@ -44,6 +45,9 @@ const menusFor: Partial<Record<AppId, string[]>> = {
   "recycle-bin": ["File", "Edit", "View", "Help"],
 };
 
+const FIRST_RUN_GUIDE_KEY = "sql98-first-run-guide-v1";
+const INTRO_THEME_PATH = "/audio/intro-theme.mp3";
+
 export function Desktop() {
   const windows = useWindowStore((s) => s.windows);
   const open = useWindowStore((s) => s.open);
@@ -63,12 +67,53 @@ export function Desktop() {
   const closeDialog = useShellStore((s) => s.closeDialog);
   const flashApp = useShellStore((s) => s.flashApp);
   const setFlashApp = useShellStore((s) => s.setFlashApp);
+  const muted = useShellStore((s) => s.muted);
 
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
   const [startOpen, setStartOpen] = useState(false);
   const [flashingId, setFlashingId] = useState<string | null>(null);
   const [frozen, setFrozen] = useState(false);
   const [reportDismissed, setReportDismissed] = useState(false);
+  const [showFirstRunGuide, setShowFirstRunGuide] = useState(false);
+  const introAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!window.localStorage.getItem(FIRST_RUN_GUIDE_KEY)) {
+      setShowFirstRunGuide(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!showFirstRunGuide || muted || typeof window === "undefined") {
+      const audio = introAudioRef.current;
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+      return;
+    }
+
+    const audio = introAudioRef.current ?? new Audio(INTRO_THEME_PATH);
+    introAudioRef.current = audio;
+    audio.loop = true;
+    audio.volume = 0.45;
+
+    const startAudio = () => {
+      void audio.play().catch(() => {
+        /* autoplay is best-effort only */
+      });
+    };
+
+    startAudio();
+    window.addEventListener("pointerdown", startAudio, { once: true });
+
+    return () => {
+      window.removeEventListener("pointerdown", startAudio);
+      audio.pause();
+      audio.currentTime = 0;
+    };
+  }, [showFirstRunGuide, muted]);
 
   const openApp = useCallback(
     (app: AppId) => {
@@ -77,6 +122,16 @@ export function Desktop() {
     },
     [open],
   );
+
+  const beginFromGuide = useCallback(() => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(FIRST_RUN_GUIDE_KEY, "seen");
+    }
+    introAudioRef.current?.pause();
+    if (introAudioRef.current) introAudioRef.current.currentTime = 0;
+    setShowFirstRunGuide(false);
+    if (phase === "offered") open("inbox");
+  }, [open, phase]);
 
   const newestWindowId = windows[windows.length - 1]?.id ?? null;
   useEffect(() => {
@@ -177,6 +232,7 @@ export function Desktop() {
       <EvidenceToast />
       <ScreenFxLayer />
       <Assistant />
+      {showFirstRunGuide && <FirstRunGuide onBegin={beginFromGuide} />}
 
       {dialog && (
         <Win98Dialog
