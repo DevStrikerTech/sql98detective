@@ -1,35 +1,69 @@
 import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 import { Win98Button } from "./Win98Button";
 import { TitleBar } from "./TitleBar";
 import { CASE_ID, CASE_TITLE } from "@/content/case001";
 import { useGameStore } from "@/lib/game/gameStore";
+import { useShellStore } from "@/lib/game/shellStore";
 
-/** The pay-off: flicker, redraw, then a big pixel CASE CLOSED stamp. */
+/** The pay-off: flicker, redraw, a line-by-line report, then a big pixel stamp. */
 export function CaseClosed({ onDismiss }: { onDismiss: () => void }) {
   const hintsUsed = useGameStore((s) => s.hintsUsed);
   const startedAt = useGameStore((s) => s.startedAt);
   const finishedAt = useGameStore((s) => s.finishedAt);
+  const playCue = useShellStore((s) => s.playCue);
+  const say = useShellStore((s) => s.say);
   const [stage, setStage] = useState<0 | 1 | 2>(0);
-
-  useEffect(() => {
-    const a = window.setTimeout(() => setStage(1), 550);
-    const b = window.setTimeout(() => setStage(2), 1250);
-    return () => {
-      window.clearTimeout(a);
-      window.clearTimeout(b);
-    };
-  }, []);
+  const [rows, setRows] = useState(0);
 
   const elapsed =
     startedAt && finishedAt ? Math.max(1, Math.round((finishedAt - startedAt) / 1000)) : null;
   const time = elapsed ? `${Math.floor(elapsed / 60)}m ${elapsed % 60}s` : "—";
+
+  const report: [string, string, boolean?][] = [
+    ["CULPRIT", "KEVIN", true],
+    ["CAUSE", "Deleted payroll.xls at 09:21."],
+    ["MOTIVE", "Filed under: 'we may never know'."],
+    ["SQL CONCEPTS USED", "SELECT · WHERE · AND"],
+    ["TIME", time],
+    ["HINTS USED", String(hintsUsed)],
+    ["RANK", hintsUsed === 0 ? "DETECTIVE FIRST CLASS" : "DETECTIVE"],
+  ];
+
+  useEffect(() => {
+    const timers: number[] = [];
+    timers.push(window.setTimeout(() => setStage(1), 550));
+    report.forEach((_, i) => {
+      timers.push(
+        window.setTimeout(
+          () => {
+            setRows(i + 1);
+            playCue("query");
+          },
+          700 + i * 190,
+        ),
+      );
+    });
+    timers.push(
+      window.setTimeout(
+        () => {
+          setStage(2);
+          playCue("solved");
+          say("Case closed. Try not to look smug on the way out.");
+        },
+        750 + report.length * 190,
+      ),
+    );
+    return () => timers.forEach(clearTimeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (stage === 0) {
     return <div className="absolute inset-0 z-[9500] anim-flicker bg-surface-hilite" />;
   }
 
   return (
-    <div className="absolute inset-0 z-[9500] flex items-center justify-center bg-desktop/70">
+    <div className="win98-scanlines absolute inset-0 z-[9500] flex items-center justify-center bg-desktop/80">
       <div className="win98-out anim-snap-open relative w-[420px] bg-surface p-[3px]">
         <TitleBar title="Case Report - CASE 001" icon="case-files" active onClose={onDismiss} />
         <div className="anim-redraw win98-field m-[3px] p-4">
@@ -38,12 +72,14 @@ export function CaseClosed({ onDismiss }: { onDismiss: () => void }) {
           </div>
           <div className="mb-3 text-[15px] font-bold tracking-wide text-ink">{CASE_TITLE}</div>
 
-          <Row label="CULPRIT" value="KEVIN" bold />
-          <Row label="CAUSE" value="Deleted payroll.xls at 09:21." />
-          <Row label="SQL CONCEPTS USED" value="SELECT · WHERE · AND" />
-          <Row label="TIME" value={time} />
-          <Row label="HINTS USED" value={String(hintsUsed)} />
-          <Row label="RANK" value={hintsUsed === 0 ? "DETECTIVE FIRST CLASS" : "DETECTIVE"} />
+          {report.slice(0, rows).map(([label, value, bold]) => (
+            <Row key={label} label={label} value={value} bold={bold} />
+          ))}
+          {rows < report.length && (
+            <div className="py-[3px] text-[11px] text-ink-disabled">
+              COMPILING REPORT<span className="anim-blink">_</span>
+            </div>
+          )}
 
           {stage === 2 && (
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
@@ -57,7 +93,10 @@ export function CaseClosed({ onDismiss }: { onDismiss: () => void }) {
           )}
         </div>
         <div className="flex justify-center gap-2 pb-3">
-          <Win98Button onClick={onDismiss} className="font-bold">
+          <Win98Button
+            onClick={onDismiss}
+            className={cn("font-bold", stage === 2 && "anim-pulse-border")}
+          >
             RETURN TO DESKTOP
           </Win98Button>
         </div>
@@ -68,7 +107,7 @@ export function CaseClosed({ onDismiss }: { onDismiss: () => void }) {
 
 function Row({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
   return (
-    <div className="flex gap-2 border-b border-dotted border-surface-shadow py-[3px] text-[11px]">
+    <div className="anim-typeout flex gap-2 border-b border-dotted border-surface-shadow py-[3px] text-[11px]">
       <span className="w-[130px] shrink-0 tracking-[0.1em] text-ink-disabled">{label}</span>
       <span className={bold ? "font-bold text-ink" : "text-ink"}>{value}</span>
     </div>
