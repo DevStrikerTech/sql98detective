@@ -52,11 +52,12 @@ function getCtx(): AudioContext | null {
   return ctx;
 }
 
-export function playCueSound(cue: SoundCue) {
+function playSequence(notes: Note[]) {
   const ac = getCtx();
-  if (!ac) return;
+  if (!ac) return () => {};
   let t = ac.currentTime + 0.01;
-  for (const n of CUES[cue]) {
+  const active: OscillatorNode[] = [];
+  for (const n of notes) {
     const dur = n.d / 1000;
     if (n.f > 0) {
       const osc = ac.createOscillator();
@@ -68,7 +69,41 @@ export function playCueSound(cue: SoundCue) {
       osc.connect(g).connect(ac.destination);
       osc.start(t);
       osc.stop(t + dur);
+      active.push(osc);
     }
     t += dur;
   }
+  return () => {
+    const now = ac.currentTime;
+    for (const osc of active) {
+      try {
+        osc.stop(now + 0.01);
+      } catch {
+        /* already finished */
+      }
+    }
+  };
+}
+
+const BOOT_THEME: Note[] = [
+  { f: 523, d: 80, gain: 0.045 },
+  { f: 659, d: 80, gain: 0.045 },
+  { f: 784, d: 120, gain: 0.05 },
+  { f: 0, d: 40 },
+  { f: 784, d: 80, gain: 0.045 },
+  { f: 988, d: 80, gain: 0.045 },
+  { f: 1174, d: 140, gain: 0.05 },
+  { f: 0, d: 60 },
+  { f: 1046, d: 120, type: "triangle", gain: 0.035 },
+  { f: 1174, d: 120, type: "triangle", gain: 0.035 },
+  { f: 1318, d: 220, type: "triangle", gain: 0.04 },
+];
+
+export function playCueSound(cue: SoundCue) {
+  void playSequence(CUES[cue]);
+}
+
+/** Short arcade-style startup sting for the loading screen. */
+export function playBootTheme() {
+  return playSequence(BOOT_THEME);
 }

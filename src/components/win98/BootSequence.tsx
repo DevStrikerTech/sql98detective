@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { bootLines } from "@/content/boot";
+import { playBootTheme } from "@/lib/game/audio";
 
 type Phase = "bios" | "splash";
 
@@ -19,8 +20,12 @@ export function BootSequence({ onDone }: { onDone: () => void }) {
 
   useEffect(() => {
     if (phase !== "splash") return;
+    const stopTheme = playBootTheme();
     const t = setTimeout(onDone, 2600);
-    return () => clearTimeout(t);
+    return () => {
+      stopTheme();
+      clearTimeout(t);
+    };
   }, [phase, onDone]);
 
   if (phase === "bios") {
