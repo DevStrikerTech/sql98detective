@@ -100,34 +100,29 @@ export function FirstRunGuide({ onBegin }: Props) {
               </div>
             </div>
             <div className="mt-2 flex items-center justify-between gap-2">
-              <span className="text-[11px] text-ink-disabled">
-                {step + 1} / {LINES.length}
+              <span className="flex items-center gap-1 text-[11px] tracking-[0.14em] text-ink-disabled">
+                {LINES.map((l, i) => (
+                  <span key={l} className={i <= step ? "font-bold text-ink" : undefined}>
+                    {i <= step ? "■" : "□"}
+                  </span>
+                ))}
               </span>
-              <div className="flex gap-2">
+              <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                 <Win98Button className="px-3" onClick={onBegin}>
                   SKIP
                 </Win98Button>
-                {lastStep ? (
-                  <Win98Button className="px-3 font-bold" onClick={onBegin} disabled={!typingDone}>
-                    LET'S GO
-                  </Win98Button>
-                ) : (
-                  <Win98Button
-                    className="px-3 font-bold"
-                    onClick={() => setStep((s) => s + 1)}
-                    disabled={!typingDone}
-                  >
-                    NEXT
-                  </Win98Button>
-                )}
+                <Win98Button className="px-3 font-bold anim-pulse-border" onClick={advance}>
+                  {!typingDone ? "MORE" : lastStep ? "LET'S GO" : "NEXT"}
+                </Win98Button>
               </div>
             </div>
           </div>
         </div>
 
         <div className="win98-in mx-[3px] mb-[3px] truncate px-[5px] py-[2px] text-[11px] text-ink-disabled">
-          First-time briefing only. After this, Byte trusts you to snoop unsupervised.
+          Click anywhere or press ENTER · ESC skips. Byte only does this once.
         </div>
+
       </div>
     </div>
   );
