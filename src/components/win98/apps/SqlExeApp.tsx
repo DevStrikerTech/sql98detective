@@ -98,12 +98,19 @@ export function SqlExeApp() {
 
   const execute = () => {
     if (running) return;
+    if (!query.trim()) {
+      playCue("error");
+      setStatus("NO QUERY ENTERED");
+      push("** THE RECORD CANNOT ANSWER A BLANK PAGE **");
+      return;
+    }
     playCue("query");
     setRunning(true);
     setResult(null);
     setRevealStep(0);
     setStatus("EXECUTING QUERY...");
     setLines([]);
+
     const steps = [
       "CONNECTING TO EVIDENCE.MDB . . .",
       "SEARCHING RECORDS . . .",
@@ -201,15 +208,25 @@ export function SqlExeApp() {
       </div>
 
       <div className="shrink-0">
-        <label className="mb-[3px] block text-[11px] text-ink">Query:</label>
+        <label className="mb-[3px] flex items-center justify-between text-[11px] text-ink">
+          <span>Query:</span>
+          <span className="text-ink-disabled">CTRL+ENTER to execute</span>
+        </label>
         <textarea
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+              e.preventDefault();
+              execute();
+            }
+          }}
           spellCheck={false}
           className="win98-field win98-scroll h-[54px] w-full resize-none p-[3px] font-mono text-[12px] text-ink outline-none"
           style={running ? { cursor: "wait" } : undefined}
         />
       </div>
+
 
       <div
         ref={outRef}

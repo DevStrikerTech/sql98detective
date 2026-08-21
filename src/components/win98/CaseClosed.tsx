@@ -71,6 +71,8 @@ export function CaseClosed({ onDismiss }: { onDismiss: () => void }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const reportDone = rows >= report.length;
+
   if (stage === 0) {
     return <div className="absolute inset-0 z-[9500] anim-flicker bg-surface-hilite" />;
   }
@@ -79,6 +81,7 @@ export function CaseClosed({ onDismiss }: { onDismiss: () => void }) {
     <div className="win98-scanlines absolute inset-0 z-[9500] flex items-center justify-center bg-desktop/80">
       <div className="win98-out anim-snap-open relative w-[420px] bg-surface p-[3px]">
         <TitleBar title="Case Report - CASE 001" icon="case-files" active onClose={onDismiss} />
+
         <div className="relative anim-redraw win98-field m-[3px] p-4">
           <div className="text-[11px] tracking-[0.2em] text-ink-disabled">
             PRECINCT DATA SYSTEMS — CASE {CASE_ID}
@@ -130,14 +133,22 @@ export function CaseClosed({ onDismiss }: { onDismiss: () => void }) {
           </div>
         )}
 
-        <div className="flex justify-center gap-2 pb-3">
+        <div className="flex flex-col items-center gap-1 pb-3">
           <Win98Button
             onClick={onDismiss}
             className={cn("font-bold", stage >= 2 && "anim-pulse-border")}
           >
-            RETURN TO DESKTOP
+            {reportDone ? "RETURN TO DESKTOP" : "STAND DOWN"}
           </Win98Button>
+          <span className="text-[11px] tracking-[0.1em] text-ink-disabled">
+            {stage >= 3
+              ? "Report filed. Chief Brannigan has been notified, loudly."
+              : reportDone
+                ? "Signing the report . . ."
+                : "Stenographer is still typing."}
+          </span>
         </div>
+
       </div>
     </div>
   );
