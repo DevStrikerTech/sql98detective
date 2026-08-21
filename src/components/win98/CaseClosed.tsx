@@ -130,7 +130,6 @@ export function CaseClosed({ onDismiss }: { onDismiss: () => void }) {
           </div>
         )}
 
-
         <div className="flex justify-center gap-2 pb-3">
           <Win98Button
             onClick={onDismiss}

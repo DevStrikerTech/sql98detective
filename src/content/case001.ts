@@ -357,19 +357,19 @@ export const caseFollowUps: {
     showAfter: "sql",
   },
   {
-    id: "linda-vindicated",
-    from: "Linda (Accounting)",
-    subject: "RE: I want it on record",
-    date: "8/24/98 10:21",
-    body: "Detective,\n\nI have been told the matter is resolved. I would like a copy of the log entry showing 09:15, CLOSE, linda.\n\nLaminated, if the machine allows.\n\n— Linda",
-    showAfter: "solved",
-  },
-  {
     id: "chief-congrats",
     from: "Chief Brannigan",
     subject: "RE: RE: URGENT!!! payroll.xls IS GONE",
     date: "8/24/98 10:14",
     body: "GOOD WORK DETECTIVE.\n\nKevin has been escorted to the break room for a conversation about honesty and backups.\n\nAccounting has stopped screaming. Finance has started, but for unrelated reasons.\n\nTake the rest of the morning. Not the afternoon.\n\n— Chief",
+    showAfter: "solved",
+  },
+  {
+    id: "linda-vindicated",
+    from: "Linda (Accounting)",
+    subject: "RE: I want it on record",
+    date: "8/24/98 10:21",
+    body: "Detective,\n\nI have been told the matter is resolved. I would like a copy of the log entry showing 09:15, CLOSE, linda.\n\nLaminated, if the machine allows.\n\n— Linda",
     showAfter: "solved",
   },
 ];
