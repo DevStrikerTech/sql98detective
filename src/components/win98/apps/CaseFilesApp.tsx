@@ -5,9 +5,11 @@ import { cn } from "@/lib/utils";
 import {
   CASE_ID,
   CASE_TITLE,
+  caseHeat,
   clueNotes,
   clues,
   dossierChatter,
+  suspectObservations,
   suspects,
   type ClueId,
 } from "@/content/case001";
