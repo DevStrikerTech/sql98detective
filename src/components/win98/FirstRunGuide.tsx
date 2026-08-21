@@ -49,9 +49,36 @@ export function FirstRunGuide({ onBegin }: Props) {
     return () => window.clearInterval(id);
   }, [activeLine, step]);
 
+  // One key does everything: finish the line, then move on. No reading race.
+  const advance = () => {
+    if (!typingDone) {
+      setTyped(activeLine);
+      return;
+    }
+    if (lastStep) onBegin();
+    else setStep((s) => s + 1);
+  };
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        advance();
+      } else if (e.key === "Escape") {
+        onBegin();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
   return (
-    <div className="absolute inset-0 z-[9300] flex items-center justify-center bg-boot/50 p-4">
+    <div
+      className="absolute inset-0 z-[9300] flex items-center justify-center bg-boot/50 p-4"
+      onClick={advance}
+    >
       <div className="win98-out anim-snap-open w-full max-w-[480px] bg-surface p-[3px]">
+
         <div className="win98-titlebar-active flex items-center gap-2 px-[4px] py-[2px]">
           <span className="text-[11px] font-bold tracking-[0.12em] text-title-ink">
             BYTE.DOG — Precinct Sniffer
