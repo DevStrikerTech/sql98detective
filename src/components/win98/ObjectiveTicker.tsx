@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { Win98Icon } from "./Win98Icon";
 import { useGameStore } from "@/lib/game/gameStore";
 import { currentObjective } from "@/lib/game/objective";
-import { CASE_ID } from "@/content/case001";
+import { CASE_ID, clues } from "@/content/case001";
 
 /**
  * A pinned "note to self" strip above the taskbar. In-universe guidance:
