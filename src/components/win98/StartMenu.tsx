@@ -46,7 +46,6 @@ export function StartMenu({
     { label: "Run...", icon: "sql-exe", action: () => onNotImplemented("Run") },
   ];
 
-
   return (
     <div className="win98-out anim-snap-open absolute bottom-[28px] left-0 z-[8600] flex w-[240px] bg-surface p-[3px]">
       <div className="win98-titlebar-active flex w-[22px] shrink-0 items-end justify-center pb-3">
