@@ -11,7 +11,6 @@ const LINES = [
   "When you're sure, open SQL.exe and make the record say it out loud.",
 ];
 
-
 const DOG_FRAMES = [
   ` / \\__
 (    @\\___
@@ -78,7 +77,6 @@ export function FirstRunGuide({ onBegin }: Props) {
       onClick={advance}
     >
       <div className="win98-out anim-snap-open w-full max-w-[480px] bg-surface p-[3px]">
-
         <div className="win98-titlebar-active flex items-center gap-2 px-[4px] py-[2px]">
           <span className="text-[11px] font-bold tracking-[0.12em] text-title-ink">
             BYTE.DOG — Precinct Sniffer
@@ -122,7 +120,6 @@ export function FirstRunGuide({ onBegin }: Props) {
         <div className="win98-in mx-[3px] mb-[3px] truncate px-[5px] py-[2px] text-[11px] text-ink-disabled">
           Click anywhere or press ENTER · ESC skips. Byte only does this once.
         </div>
-
       </div>
     </div>
   );

@@ -148,7 +148,6 @@ export function CaseClosed({ onDismiss }: { onDismiss: () => void }) {
                 : "Stenographer is still typing."}
           </span>
         </div>
-
       </div>
     </div>
   );

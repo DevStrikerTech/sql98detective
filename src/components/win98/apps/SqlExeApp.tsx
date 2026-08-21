@@ -227,7 +227,6 @@ export function SqlExeApp() {
         />
       </div>
 
-
       <div
         ref={outRef}
         className="win98-in win98-scroll min-h-0 flex-1 overflow-auto bg-terminal p-2 font-mono text-[12px] leading-[1.45] text-terminal-ink"

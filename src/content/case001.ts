@@ -1,5 +1,6 @@
 import type { IconName } from "@/components/win98/Win98Icon";
 import type { AccessLog, SqlTableConfig } from "@/lib/game/sqlEngine";
+import type { CaseConfig } from "./caseTypes";
 
 export type { AccessLog };
 
@@ -500,6 +501,8 @@ export const caseHeat: { label: string; line: string }[] = [
   { label: "AIRTIGHT", line: "Every exhibit filed. One account no longer survives the log." },
 ];
 
+export { type CaseConfig };
+
 /**
  * Typed out in SQL.exe the first time the query engine comes online.
  * Ceremony, not instruction — the moment suspicion is allowed to become proof.
@@ -525,3 +528,19 @@ export const proofBrief: { heading: string; line: string }[] = [
     line: "One table that was in the room and cannot be embarrassed.",
   },
 ];
+
+/**
+ * Case 001 expressed as a CaseConfig — proves case001 satisfies the shared
+ * contract and that the components consuming this data can be made generic
+ * by accepting CaseConfig instead of importing case001 directly.
+ */
+export const caseConfig: CaseConfig = {
+  id: CASE_ID,
+  title: CASE_TITLE,
+  sqlTable,
+  warrantScript,
+  proofBrief,
+  revealScript,
+  epilogue: caseEpilogue,
+  clues,
+};
