@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import type { IconName } from "@/components/win98/Win98Icon";
 
-export type AppId = "my-computer" | "inbox" | "case-files" | "sql-exe" | "recycle-bin" | "about";
+export type AppId = "my-computer" | "inbox" | "case-files" | "sql-exe" | "recycle-bin" | "about" | "log-viewer";
 
 export type WindowState = {
   id: string;
@@ -30,6 +30,7 @@ export const APPS: Record<AppId, AppDef> = {
   "case-files": { title: "Case Files", icon: "case-files", width: 420, height: 260 },
   "sql-exe": { title: "SQL.exe", icon: "sql-exe", width: 540, height: 340 },
   "recycle-bin": { title: "Recycle Bin", icon: "recycle-bin", width: 460, height: 300 },
+  "log-viewer": { title: "ACCESS_LOGS.DAT - Log Viewer", icon: "document", width: 470, height: 300 },
   about: { title: "About SQL 98", icon: "info", width: 380, height: 230 },
 };
 
