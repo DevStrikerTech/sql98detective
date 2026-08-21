@@ -1,4 +1,7 @@
 import type { IconName } from "@/components/win98/Win98Icon";
+import type { AccessLog, SqlTableConfig } from "@/lib/game/sqlEngine";
+
+export type { AccessLog };
 
 export const CASE_ID = "001";
 export const CASE_TITLE = "THE MISSING SPREADSHEET";
@@ -15,19 +18,19 @@ export const suspects: Suspect[] = [
     id: "linda",
     name: "Linda",
     role: "Accounting",
-    statement: "\"I opened payroll.xls to review it. That is all. I alphabetise my staplers.\"",
+    statement: '"I opened payroll.xls to review it. That is all. I alphabetise my staplers."',
   },
   {
     id: "kevin",
     name: "Kevin",
     role: "Junior IT",
-    statement: "\"I never touched payroll.xls. Not once. Why would I. I wouldn't.\"",
+    statement: '"I never touched payroll.xls. Not once. Why would I. I wouldn\'t."',
   },
   {
     id: "gary",
     name: "Gary",
     role: "Office troublemaker",
-    statement: "\"I don't even know what a spreadsheet is. Is it a kind of jam?\"",
+    statement: '"I don\'t even know what a spreadsheet is. Is it a kind of jam?"',
   },
 ];
 
@@ -56,14 +59,6 @@ export const clues: Clue[] = [
     detail: "Log entry #4 places kevin on payroll.xls at 09:21.",
   },
 ];
-
-export type AccessLog = {
-  id: number;
-  user: string;
-  file: string;
-  action: "OPEN" | "CLOSE" | "DOWNLOAD" | "DELETE";
-  time: string;
-};
 
 export const accessLogs: AccessLog[] = [
   { id: 1, user: "linda", file: "payroll.xls", action: "OPEN", time: "09:11" },
@@ -227,8 +222,25 @@ export const caseEmail = {
   from: "Chief Brannigan",
   subject: "URGENT!!! payroll.xls IS GONE",
   date: "8/24/98 09:34",
-  body: "Someone deleted payroll.xls this morning.\n\nAccounting is panicking.\nFinance is blaming IT.\nIT is blaming Gary.\nGary says he \"doesn't even know what a spreadsheet is.\"\n\nFind out what happened.\n\n— Chief Brannigan",
+  body: 'Someone deleted payroll.xls this morning.\n\nAccounting is panicking.\nFinance is blaming IT.\nIT is blaming Gary.\nGary says he "doesn\'t even know what a spreadsheet is."\n\nFind out what happened.\n\n— Chief Brannigan',
 };
 
 export const solutionQuery =
   "SELECT username\nFROM file_access_logs\nWHERE filename = 'payroll.xls'\n  AND action = 'DELETE';";
+
+export const sqlTable: SqlTableConfig = {
+  tableName: "file_access_logs",
+  rows: accessLogs,
+  correctRowId: 5,
+  hints: [
+    "Try filtering by filename. The one that vanished.",
+    "The action you're looking for is DELETE.",
+    "Try something like:\nWHERE filename = 'payroll.xls'\n  AND action = 'DELETE'",
+  ],
+  quips: {
+    empty: "No matching records. Somebody is either innocent or very careful.",
+    correct: "One record. One name. Kevin appears to have SELECTed the wrong alibi.",
+    all: "Six suspects. Bold strategy.",
+    multiple: "Unless everyone deleted payroll.xls, we may need to narrow that down.",
+  },
+};

@@ -109,9 +109,7 @@ export function CaseFilesApp({ onRequest }: { onRequest: (what: string) => void 
                     <span className="w-[14px] shrink-0 text-center">{found ? "[X]" : "[ ]"}</span>
                     <span>
                       {found ? c.label : "— undiscovered —"}
-                      {found && (
-                        <span className="block text-ink-disabled">{c.detail}</span>
-                      )}
+                      {found && <span className="block text-ink-disabled">{c.detail}</span>}
                     </span>
                   </div>
                 );

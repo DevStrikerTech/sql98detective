@@ -1,7 +1,8 @@
 import { create } from "zustand";
 import type { IconName } from "@/components/win98/Win98Icon";
 
-export type AppId = "my-computer" | "inbox" | "case-files" | "sql-exe" | "recycle-bin" | "about" | "log-viewer";
+export type AppId =
+  "my-computer" | "inbox" | "case-files" | "sql-exe" | "recycle-bin" | "about" | "log-viewer";
 
 export type WindowState = {
   id: string;
@@ -30,7 +31,12 @@ export const APPS: Record<AppId, AppDef> = {
   "case-files": { title: "Case Files", icon: "case-files", width: 520, height: 430 },
   "sql-exe": { title: "SQL.exe", icon: "sql-exe", width: 580, height: 480 },
   "recycle-bin": { title: "Recycle Bin", icon: "recycle-bin", width: 460, height: 300 },
-  "log-viewer": { title: "ACCESS_LOGS.DAT - Log Viewer", icon: "document", width: 470, height: 300 },
+  "log-viewer": {
+    title: "ACCESS_LOGS.DAT - Log Viewer",
+    icon: "document",
+    width: 470,
+    height: 300,
+  },
   about: { title: "About SQL 98", icon: "info", width: 380, height: 230 },
 };
 
@@ -93,9 +99,7 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
       const nextZ = s.topZ + 1;
       return {
         topZ: nextZ,
-        windows: s.windows.map((w) =>
-          w.id === id ? { ...w, z: nextZ, minimized: false } : w,
-        ),
+        windows: s.windows.map((w) => (w.id === id ? { ...w, z: nextZ, minimized: false } : w)),
       };
     });
   },

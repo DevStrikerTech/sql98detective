@@ -27,13 +27,7 @@ type ShellStore = {
   setFlashApp: (app: AppId | null) => void;
 };
 
-export type SoundCue =
-  | "boot"
-  | "message"
-  | "error"
-  | "query"
-  | "evidence"
-  | "solved";
+export type SoundCue = "boot" | "message" | "error" | "query" | "evidence" | "solved";
 
 let lineSeq = 0;
 

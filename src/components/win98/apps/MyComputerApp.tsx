@@ -20,7 +20,13 @@ export function MyComputerApp() {
 
   const items = path.length === 0 ? fileSystem : (path[path.length - 1]!.children ?? []);
   const location =
-    path.length === 0 ? "My Computer" : "C:\\" + path.slice(1).map((n) => n.name).join("\\");
+    path.length === 0
+      ? "My Computer"
+      : "C:\\" +
+        path
+          .slice(1)
+          .map((n) => n.name)
+          .join("\\");
   const selected = items.find((i) => i.name === sel) ?? null;
   const investigating = phase !== "idle" && phase !== "offered";
 
@@ -71,7 +77,9 @@ export function MyComputerApp() {
           message: `${node.name}\n\n${node.detail}\n\nThis machine refuses to run it, and honestly, good.`,
           icon: "warning",
         });
-        say("Evidence of questionable musical taste. Not necessarily evidence of spreadsheet murder.");
+        say(
+          "Evidence of questionable musical taste. Not necessarily evidence of spreadsheet murder.",
+        );
         break;
       }
       default:

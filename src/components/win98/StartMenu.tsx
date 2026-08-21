@@ -26,7 +26,12 @@ export function StartMenu({ onOpenApp, onShutdown, onNotImplemented, onClose }: 
     { label: "Programs", icon: "programs", arrow: true, action: () => onOpenApp("sql-exe") },
     { label: "Case Files", icon: "case-files", action: () => onOpenApp("case-files") },
     { label: "Inbox", icon: "inbox", action: () => onOpenApp("inbox") },
-    { label: "Settings", icon: "settings", arrow: true, action: () => onNotImplemented("Settings") },
+    {
+      label: "Settings",
+      icon: "settings",
+      arrow: true,
+      action: () => onNotImplemented("Settings"),
+    },
     { label: "Find Suspect...", icon: "find", action: () => onNotImplemented("Find") },
     { label: "Help", icon: "help", action: () => onOpenApp("about") },
     { label: "Run...", icon: "sql-exe", action: () => onNotImplemented("Run") },

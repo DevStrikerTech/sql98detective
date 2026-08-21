@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Win98Icon } from "../Win98Icon";
 import { Win98Button } from "../Win98Button";
@@ -16,11 +16,13 @@ export function InboxApp() {
   const playCue = useShellStore((s) => s.playCue);
   const openWindow = useWindowStore((s) => s.open);
 
-  const list: Mail[] = useMemo(
-    () => (phase === "idle" ? emails : [caseEmail, ...emails]),
-    [phase],
-  );
+  const list: Mail[] = useMemo(() => (phase === "idle" ? emails : [caseEmail, ...emails]), [phase]);
   const [selectedId, setSelectedId] = useState<string>(list[0]!.id);
+
+  useEffect(() => {
+    if (phase === "offered") setSelectedId(caseEmail.id);
+  }, [phase]);
+
   const mail = list.find((m) => m.id === selectedId) ?? list[0]!;
   const isCaseMail = mail.id === caseEmail.id;
   const accepted = phase !== "idle" && phase !== "offered";

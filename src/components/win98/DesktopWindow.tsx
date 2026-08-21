@@ -37,7 +37,10 @@ export function DesktopWindow({
     function onPointerMove(e: PointerEvent) {
       if (!drag.current) return;
       const x = Math.max(-40, e.clientX - drag.current.dx);
-      const y = Math.max(0, Math.min(window.innerHeight - TASKBAR_H - 24, e.clientY - drag.current.dy));
+      const y = Math.max(
+        0,
+        Math.min(window.innerHeight - TASKBAR_H - 24, e.clientY - drag.current.dy),
+      );
       onMove(win.id, x, y);
     }
     function onPointerUp() {

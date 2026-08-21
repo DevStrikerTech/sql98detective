@@ -13,10 +13,15 @@ import { SqlExeApp } from "./apps/SqlExeApp";
 import { LogViewerApp } from "./apps/LogViewerApp";
 import { RecycleBinApp } from "./apps/RecycleBinApp";
 import { AboutApp } from "./apps/AboutApp";
-import { useWindowStore, useActiveWindowId, type AppId, type WindowState } from "@/lib/win98/windowStore";
+import {
+  useWindowStore,
+  useActiveWindowId,
+  type AppId,
+  type WindowState,
+} from "@/lib/win98/windowStore";
 import { useGameStore } from "@/lib/game/gameStore";
 import { useShellStore } from "@/lib/game/shellStore";
-import { CASE_ID, clues } from "@/content/case001";
+import { useCaseFlow } from "@/lib/game/useCaseFlow";
 import type { IconName } from "./Win98Icon";
 
 const desktopIcons: { app: AppId; label: string; icon: IconName }[] = [
@@ -48,16 +53,13 @@ export function Desktop() {
   const activeId = useActiveWindowId();
 
   const phase = useGameStore((s) => s.phase);
-  const offerCase = useGameStore((s) => s.offerCase);
-  const discovered = useGameStore((s) => s.discoveredClues);
-  const sqlUnlocked = useGameStore((s) => s.sqlUnlocked);
+  const { statusFor } = useCaseFlow();
 
   const dialog = useShellStore((s) => s.dialog);
   const showDialog = useShellStore((s) => s.showDialog);
   const closeDialog = useShellStore((s) => s.closeDialog);
   const flashApp = useShellStore((s) => s.flashApp);
   const setFlashApp = useShellStore((s) => s.setFlashApp);
-  const playCue = useShellStore((s) => s.playCue);
 
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
   const [startOpen, setStartOpen] = useState(false);
@@ -73,31 +75,13 @@ export function Desktop() {
     [open],
   );
 
+  const newestWindowId = windows[windows.length - 1]?.id ?? null;
   useEffect(() => {
-    const last = windows[windows.length - 1];
-    if (!last) return;
-    setFlashingId(last.id);
+    if (!newestWindowId) return;
+    setFlashingId(newestWindowId);
     const t = setTimeout(() => setFlashingId(null), 600);
     return () => clearTimeout(t);
-  }, [windows.length]);
-
-  /* Stage 1 — the quiet desktop, then an incoming message. */
-  useEffect(() => {
-    if (phase !== "idle") return;
-    const t = setTimeout(() => {
-      offerCase(CASE_ID);
-      setFlashApp("inbox");
-      playCue("message");
-      showDialog({
-        title: "New Message Received",
-        message:
-          "From: Chief Brannigan\nSubject: URGENT!!! payroll.xls IS GONE\n\nOpen the Inbox to read it.",
-        icon: "mail",
-        okLabel: "OK",
-      });
-    }, 4200);
-    return () => clearTimeout(t);
-  }, [phase, offerCase, setFlashApp, playCue, showDialog]);
+  }, [newestWindowId]);
 
   /* Clear icon flashing after a few blinks. */
   useEffect(() => {
@@ -116,27 +100,6 @@ export function Desktop() {
         message: `${what} is not available in this build.\n\nThe responsible module is still on a floppy disk somewhere in the evidence locker.`,
       });
     }, 700);
-  };
-
-  const statusFor = (app: AppId): string | undefined => {
-    switch (app) {
-      case "my-computer":
-        return "Double-click to open";
-      case "inbox":
-        return phase === "idle" ? "5 message(s), 3 unread" : "6 message(s), 1 urgent";
-      case "case-files":
-        return phase === "idle" || phase === "offered"
-          ? "No case assigned"
-          : `CASE ${CASE_ID} — ${discovered.length}/${clues.length} clues`;
-      case "sql-exe":
-        return sqlUnlocked ? "Query engine online" : "Query engine locked";
-      case "log-viewer":
-        return "6 record(s)";
-      case "recycle-bin":
-        return "5 object(s)  1.20 MB";
-      default:
-        return undefined;
-    }
   };
 
   return (

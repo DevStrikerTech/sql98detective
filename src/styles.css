@@ -189,12 +189,11 @@
 
 @utility win98-wallpaper {
   background-color: var(--color-desktop);
-  background-image:
-    radial-gradient(
-      circle at 1px 1px,
-      color-mix(in oklab, var(--color-surface-hilite) 8%, transparent) 1px,
-      transparent 0
-    );
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    color-mix(in oklab, var(--color-surface-hilite) 8%, transparent) 1px,
+    transparent 0
+  );
   background-size: 4px 4px;
 }
 

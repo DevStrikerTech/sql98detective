@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Win98Button } from "../Win98Button";
 import { Win98Icon } from "../Win98Icon";
-import { hints, runQuery, type SqlOutcome } from "@/lib/game/sqlEngine";
+import { createSqlEngine, type SqlOutcome } from "@/lib/game/sqlEngine";
+import { sqlTable } from "@/content/case001";
 import { useGameStore } from "@/lib/game/gameStore";
 import { useShellStore } from "@/lib/game/shellStore";
 
@@ -15,11 +16,13 @@ export function SqlExeApp() {
   const phase = useGameStore((s) => s.phase);
   const sqlUnlocked = useGameStore((s) => s.sqlUnlocked);
   const hintsUsed = useGameStore((s) => s.hintsUsed);
-  const useHint = useGameStore((s) => s.useHint);
+  const consumeHint = useGameStore((s) => s.useHint);
   const revealCulprit = useGameStore((s) => s.revealCulprit);
   const solveCase = useGameStore((s) => s.solveCase);
   const say = useShellStore((s) => s.say);
   const playCue = useShellStore((s) => s.playCue);
+
+  const { runQuery, hints } = useMemo(() => createSqlEngine(sqlTable), []);
 
   const [query, setQuery] = useState("SELECT username\nFROM file_access_logs\nWHERE ");
   const [lines, setLines] = useState<string[]>([...BOOT_LINES, "", "READY."]);
@@ -69,28 +72,35 @@ export function SqlExeApp() {
     setResult(null);
     setStatus("EXECUTING QUERY...");
     setLines([]);
-    const steps = ["CONNECTING TO EVIDENCE.MDB . . .", "SEARCHING RECORDS . . .", "FILTERING . . ."];
+    const steps = [
+      "CONNECTING TO EVIDENCE.MDB . . .",
+      "SEARCHING RECORDS . . .",
+      "FILTERING . . .",
+    ];
     timers.current.forEach((t) => clearTimeout(t));
     timers.current = [];
     steps.forEach((s, i) => {
       timers.current.push(window.setTimeout(() => push(s), 300 + i * 380));
     });
     timers.current.push(
-      window.setTimeout(() => {
-        const outcome = runQuery(query);
-        setResult(outcome);
-        setRunning(false);
-        setStatus(outcome.statusText);
-        push(outcome.status === "error" ? `** ${outcome.statusText} **` : outcome.statusText);
-        if (outcome.message) push(outcome.message);
-        if (outcome.quip) say(outcome.quip);
-        if (outcome.correct) {
-          revealCulprit();
-          playCue("evidence");
-        } else {
-          playCue("error");
-        }
-      }, 300 + steps.length * 380 + 420),
+      window.setTimeout(
+        () => {
+          const outcome = runQuery(query);
+          setResult(outcome);
+          setRunning(false);
+          setStatus(outcome.statusText);
+          push(outcome.status === "error" ? `** ${outcome.statusText} **` : outcome.statusText);
+          if (outcome.message) push(outcome.message);
+          if (outcome.quip) say(outcome.quip);
+          if (outcome.correct) {
+            revealCulprit();
+            playCue("evidence");
+          } else {
+            playCue("error");
+          }
+        },
+        300 + steps.length * 380 + 420,
+      ),
     );
   };
 
@@ -103,7 +113,7 @@ export function SqlExeApp() {
 
   const nextHint = () => {
     const idx = Math.min(hintsUsed, hints.length - 1);
-    useHint();
+    consumeHint();
     push(`HINT ${idx + 1}: ${hints[idx]!}`);
     setStatus(`HINT ${idx + 1} OF ${hints.length}`);
   };
@@ -122,9 +132,7 @@ export function SqlExeApp() {
         <Win98Button className="min-w-0 px-2" onClick={nextHint} disabled={running}>
           Hint
         </Win98Button>
-        <span className="ml-auto pr-1 text-[11px] text-ink-disabled">
-          Table: file_access_logs
-        </span>
+        <span className="ml-auto pr-1 text-[11px] text-ink-disabled">Table: file_access_logs</span>
       </div>
 
       <div className="win98-groove shrink-0 bg-surface px-2 py-1 text-[11px]">
