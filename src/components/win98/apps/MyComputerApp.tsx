@@ -2,7 +2,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Win98Icon } from "../Win98Icon";
 import { Win98Button } from "../Win98Button";
-import { fileSystem, type FsNode } from "@/content/case001";
+import { clues, fileSystem, type FsNode } from "@/content/case001";
 import { useGameStore } from "@/lib/game/gameStore";
 import { useShellStore } from "@/lib/game/shellStore";
 import { useWindowStore } from "@/lib/win98/windowStore";
@@ -16,6 +16,9 @@ export function MyComputerApp() {
   const showDialog = useShellStore((s) => s.showDialog);
   const say = useShellStore((s) => s.say);
   const playCue = useShellStore((s) => s.playCue);
+  const logEvidence = useShellStore((s) => s.logEvidence);
+  const fireScreenFx = useShellStore((s) => s.fireScreenFx);
+  const discoveredCount = useGameStore((s) => s.discoveredClues.length);
   const openWindow = useWindowStore((s) => s.open);
 
   const items = path.length === 0 ? fileSystem : (path[path.length - 1]!.children ?? []);
@@ -39,8 +42,21 @@ export function MyComputerApp() {
     inspect(node);
   };
 
-  const inspect = (node: FsNode) => {
+  /** Shared celebration for a brand-new clue: flash, chime, stamped slip. */
+  const celebrate = (clueId: string) => {
+    const clue = clues.find((c) => c.id === clueId);
+    fireScreenFx("flicker");
     playCue("evidence");
+    logEvidence({
+      label: clue?.label ?? "New evidence",
+      detail: clue?.detail ?? "",
+      index: Math.min(discoveredCount + 1, clues.length),
+      total: clues.length,
+    });
+  };
+
+  const inspect = (node: FsNode) => {
+    playCue("query");
     switch (node.action) {
       case "inspect-payroll": {
         const isNew = investigating && discoverClue("payroll-missing");
@@ -54,13 +70,18 @@ export function MyComputerApp() {
           icon: "warning",
           okLabel: isNew ? "ADD TO CASE FILE" : "OK",
         });
-        if (isNew) say("Deleted at 09:21. Suspiciously precise for an accident.");
+        if (isNew) {
+          celebrate("payroll-missing");
+          say("Deleted at 09:21. Suspiciously precise for an accident.");
+        }
         break;
       }
       case "open-logs": {
         const isNew = investigating && discoverClue("access-logs");
         openWindow("log-viewer");
         if (isNew) {
+          celebrate("access-logs");
+          say("Six operations before 09:23. One of them is a confession.");
           showDialog({
             title: "EVIDENCE FOUND",
             message:

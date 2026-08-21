@@ -3,6 +3,7 @@ import { Win98Icon } from "../Win98Icon";
 import { cn } from "@/lib/utils";
 import { CASE_ID, CASE_TITLE, clues, suspects } from "@/content/case001";
 import { useGameStore } from "@/lib/game/gameStore";
+import { currentObjective } from "@/lib/game/objective";
 
 export function CaseFilesApp({ onRequest }: { onRequest: (what: string) => void }) {
   const phase = useGameStore((s) => s.phase);
@@ -24,15 +25,11 @@ export function CaseFilesApp({ onRequest }: { onRequest: (what: string) => void 
   }
 
   const solved = phase === "solved";
-  const objective = solved
-    ? "Case closed. File the paperwork."
-    : discovered.length === 0
-      ? "Inspect the computer for evidence."
-      : !sqlUnlocked
-        ? "Find the file access records in C:\\OFFICE\\LOGS\\."
-        : phase === "revealed"
-          ? "Confirm the accusation in SQL.exe."
-          : "Interrogate the records with SQL.exe.";
+  const objective = currentObjective({
+    phase,
+    discoveredCount: discovered.length,
+    sqlUnlocked,
+  });
 
   return (
     <div className="win98-scroll min-h-0 flex-1 overflow-auto bg-surface p-[2px]">
@@ -117,8 +114,16 @@ export function CaseFilesApp({ onRequest }: { onRequest: (what: string) => void 
             </div>
           </Section>
 
-          <Section label="CURRENT OBJECTIVE">
-            <div className="text-[11px] font-bold text-ink">{objective}</div>
+          <Section label={`CURRENT OBJECTIVE — ${objective.code}`}>
+            <div className="win98-groove bg-surface p-2">
+              <div className="text-[11px] font-bold text-ink">
+                <span className="anim-blink mr-1">▸</span>
+                {objective.text}
+              </div>
+              <div className="mt-[2px] text-[11px] tracking-[0.1em] text-ink-disabled">
+                GO TO: {objective.where.toUpperCase()}
+              </div>
+            </div>
           </Section>
         </div>
       </div>

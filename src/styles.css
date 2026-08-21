@@ -362,3 +362,103 @@
 @utility anim-stamp {
   animation: win98-stamp 260ms steps(5, end);
 }
+
+/* ---------- Milestone: drama & game-feel effects ---------- */
+
+@keyframes win98-crt-burst {
+  0% {
+    opacity: 0.85;
+  }
+  30% {
+    opacity: 0.1;
+  }
+  55% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes win98-shudder {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(-2px, 1px);
+  }
+  40% {
+    transform: translate(2px, -1px);
+  }
+  60% {
+    transform: translate(-1px, -2px);
+  }
+  80% {
+    transform: translate(1px, 2px);
+  }
+}
+
+@keyframes win98-scanline-sweep {
+  0% {
+    background-position: 0 -100%;
+  }
+  100% {
+    background-position: 0 200%;
+  }
+}
+
+@keyframes win98-pulse-border {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 var(--color-title);
+  }
+  50% {
+    box-shadow: 0 0 0 3px var(--color-title);
+  }
+}
+
+@keyframes win98-typeout {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@utility anim-crt-burst {
+  animation: win98-crt-burst 320ms steps(3, end);
+}
+
+@utility anim-shudder {
+  animation: win98-shudder 420ms steps(2, end) 2;
+}
+
+@utility anim-scanline-sweep {
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    color-mix(in oklab, var(--color-terminal-ink) 22%, transparent) 48%,
+    transparent 60%
+  );
+  background-size: 100% 60%;
+  background-repeat: no-repeat;
+  animation: win98-scanline-sweep 420ms linear;
+}
+
+@utility anim-pulse-border {
+  animation: win98-pulse-border 900ms steps(2, end) infinite;
+}
+
+@utility anim-typeout {
+  animation: win98-typeout 420ms steps(24, end);
+}
+
+@utility win98-scanlines {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    color-mix(in oklab, black 16%, transparent) 0 1px,
+    transparent 1px 3px
+  );
+}

@@ -21,6 +21,7 @@ export function SqlExeApp() {
   const solveCase = useGameStore((s) => s.solveCase);
   const say = useShellStore((s) => s.say);
   const playCue = useShellStore((s) => s.playCue);
+  const fireScreenFx = useShellStore((s) => s.fireScreenFx);
 
   const { runQuery, hints } = useMemo(() => createSqlEngine(sqlTable), []);
 
@@ -29,6 +30,7 @@ export function SqlExeApp() {
   const [running, setRunning] = useState(false);
   const [status, setStatus] = useState("READY");
   const [result, setResult] = useState<SqlOutcome | null>(null);
+  const [revealStep, setRevealStep] = useState(0);
   const outRef = useRef<HTMLDivElement>(null);
   const timers = useRef<number[]>([]);
 
@@ -70,6 +72,7 @@ export function SqlExeApp() {
     playCue("query");
     setRunning(true);
     setResult(null);
+    setRevealStep(0);
     setStatus("EXECUTING QUERY...");
     setLines([]);
     const steps = [
@@ -95,8 +98,20 @@ export function SqlExeApp() {
           if (outcome.correct) {
             revealCulprit();
             playCue("evidence");
+            fireScreenFx("flicker");
+            // Let the accusation land one beat at a time.
+            [700, 1500, 2300, 3100].forEach((ms, i) => {
+              timers.current.push(
+                window.setTimeout(() => {
+                  setRevealStep(i + 1);
+                  playCue(i === 3 ? "solved" : "query");
+                  if (i === 3) fireScreenFx("flicker");
+                }, ms),
+              );
+            });
           } else {
             playCue("error");
+            fireScreenFx("shake");
           }
         },
         300 + steps.length * 380 + 420,
@@ -107,6 +122,7 @@ export function SqlExeApp() {
   const clear = () => {
     setQuery("");
     setResult(null);
+    setRevealStep(0);
     setLines([...BOOT_LINES, "", "READY."]);
     setStatus("READY");
   };
@@ -180,7 +196,14 @@ export function SqlExeApp() {
               {result.rows.map((r, i) => (
                 <tr key={i}>
                   {r.map((cell, j) => (
-                    <td key={j} className="border border-terminal-ink/50 px-2">
+                    <td
+                      key={j}
+                      className={cn(
+                        "border border-terminal-ink/50 px-2",
+                        result.correct && String(cell).toLowerCase() === "kevin" &&
+                          "anim-blink font-bold",
+                      )}
+                    >
                       {cell}
                     </td>
                   ))}
@@ -190,11 +213,26 @@ export function SqlExeApp() {
           </table>
         )}
 
-        {result?.correct && (
+        {result?.correct && revealStep > 0 && (
           <div className="mt-3 border-t border-terminal-ink/40 pt-2">
-            <div className="anim-flicker">Interesting.</div>
-            <div>Kevin said he never touched payroll.xls.</div>
-            <div>The logs disagree.</div>
+            {[
+              "Interesting.",
+              "Kevin said he never touched payroll.xls.",
+              "The logs disagree. 09:21:04 — DELETE.",
+              ">>> ONE NAME MATCHES. ONE NAME LIED. <<<",
+            ]
+              .slice(0, revealStep)
+              .map((t, i) => (
+                <div
+                  key={t}
+                  className={cn(
+                    "anim-typeout",
+                    i === 3 && "mt-1 anim-flicker text-[13px] font-bold tracking-[0.12em]",
+                  )}
+                >
+                  {t}
+                </div>
+              ))}
           </div>
         )}
 
@@ -214,12 +252,13 @@ export function SqlExeApp() {
         >
           {status}
         </div>
-        {result?.correct && phase !== "solved" && (
+        {result?.correct && revealStep >= 4 && phase !== "solved" && (
           <Win98Button
-            className="font-bold"
+            className="anim-pulse-border font-bold tracking-[0.1em]"
             onClick={() => {
               solveCase();
               playCue("solved");
+              fireScreenFx("flicker");
             }}
           >
             ACCUSE KEVIN

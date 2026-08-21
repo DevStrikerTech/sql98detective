@@ -13,23 +13,36 @@ export function useCaseFlow() {
   const showDialog = useShellStore((s) => s.showDialog);
   const setFlashApp = useShellStore((s) => s.setFlashApp);
   const playCue = useShellStore((s) => s.playCue);
+  const fireScreenFx = useShellStore((s) => s.fireScreenFx);
+  const say = useShellStore((s) => s.say);
 
   useEffect(() => {
     if (phase !== "idle") return;
-    const t = setTimeout(() => {
-      offerCase(CASE_ID);
-      setFlashApp("inbox");
-      playCue("message");
-      showDialog({
-        title: "New Message Received",
-        message:
-          "From: Chief Brannigan\nSubject: URGENT!!! payroll.xls IS GONE\n\nOpen the Inbox to read it.",
-        icon: "mail",
-        okLabel: "OK",
-      });
-    }, 4200);
-    return () => clearTimeout(t);
-  }, [phase, offerCase, setFlashApp, playCue, showDialog]);
+    const timers: number[] = [];
+    timers.push(
+      window.setTimeout(() => {
+        fireScreenFx("shake");
+        playCue("message");
+      }, 3900),
+    );
+    timers.push(
+      window.setTimeout(() => {
+        offerCase(CASE_ID);
+        setFlashApp("inbox");
+        fireScreenFx("flicker");
+        playCue("message");
+        showDialog({
+          title: "!!! PRIORITY MESSAGE !!!",
+          message:
+            "INCOMING PRIORITY TRANSMISSION — 09:47\n\nFrom: Chief Brannigan\nSubject: URGENT!!! payroll.xls IS GONE\n\nThe Chief is typing in all caps. That is never good.\nOpen the Inbox.",
+          icon: "mail",
+          okLabel: "OPEN INBOX",
+        });
+        say("Priority message. Somebody upstairs is already sweating.");
+      }, 4200),
+    );
+    return () => timers.forEach(clearTimeout);
+  }, [phase, offerCase, setFlashApp, playCue, showDialog, fireScreenFx, say]);
 
   const statusFor = (app: AppId): string | undefined => {
     switch (app) {
