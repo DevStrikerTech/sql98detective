@@ -98,12 +98,19 @@ export function SqlExeApp() {
 
   const execute = () => {
     if (running) return;
+    if (!query.trim()) {
+      playCue("error");
+      setStatus("NO QUERY ENTERED");
+      push("** THE RECORD CANNOT ANSWER A BLANK PAGE **");
+      return;
+    }
     playCue("query");
     setRunning(true);
     setResult(null);
     setRevealStep(0);
     setStatus("EXECUTING QUERY...");
     setLines([]);
+
     const steps = [
       "CONNECTING TO EVIDENCE.MDB . . .",
       "SEARCHING RECORDS . . .",
