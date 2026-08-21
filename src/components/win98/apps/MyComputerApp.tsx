@@ -11,6 +11,17 @@ import { useWindowStore } from "@/lib/win98/windowStore";
 export function MyComputerApp() {
   const [path, setPath] = useState<FsNode[]>([]);
   const [sel, setSel] = useState<string | null>(null);
+  const [chatter, setChatter] = useState(0);
+
+  // The building keeps muttering to itself in the status bar.
+  useEffect(() => {
+    const id = window.setInterval(
+      () => setChatter((c) => (c + 1) % precinctChatter.length),
+      9000,
+    );
+    return () => window.clearInterval(id);
+  }, []);
+
 
   const phase = useGameStore((s) => s.phase);
   const discoverClue = useGameStore((s) => s.discoverClue);
