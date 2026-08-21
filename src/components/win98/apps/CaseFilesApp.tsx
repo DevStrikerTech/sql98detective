@@ -170,6 +170,40 @@ export function CaseFilesApp({ onRequest }: { onRequest: (what: string) => void 
                   </div>
                 </Section>
 
+                <Section label={`CASE TEMPERATURE — ${heat.label}`}>
+                  <div className="win98-groove flex items-center gap-2 bg-surface p-2">
+                    <div className="flex gap-[2px]">
+                      {clues.map((c, i) => (
+                        <span
+                          key={c.id}
+                          className={cn(
+                            "win98-in h-[14px] w-[9px]",
+                            i < discovered.length
+                              ? i >= clues.length - 1
+                                ? "anim-blink bg-destructive"
+                                : "bg-title"
+                              : "bg-field",
+                          )}
+                        />
+                      ))}
+                    </div>
+                    <div className="min-w-0 flex-1 text-[11px] leading-[1.5] text-ink">
+                      {heat.line}
+                    </div>
+                  </div>
+                  {brokenCount > 0 && (
+                    <div className="anim-redraw mt-1 text-[11px] font-bold text-destructive">
+                      <span className="anim-blink mr-1">!</span>
+                      {brokenCount} statement(s) no longer survive the record. See Suspects.
+                    </div>
+                  )}
+                  {sqlUnlocked && (
+                    <div className="anim-redraw mt-1 text-[11px] text-ink">
+                      Query access is live. The log will answer, but only in SQL.
+                    </div>
+                  )}
+                </Section>
+
                 {latestNote && (
                   <Section label="LAST ENTRY IN THE NOTEBOOK">
                     <div className="win98-groove bg-surface p-2">
