@@ -10,7 +10,6 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
   return (
@@ -38,7 +37,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    console.error("Root route error boundary", error);
   }, [error]);
 
   return (
@@ -77,14 +76,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "SQL 98: Digital Detective" },
+      {
+        name: "description",
+        content:
+          "A retro browser detective game where players solve office mysteries inside a fictional Windows 98 desktop using SQL.",
+      },
+      { name: "author", content: "SQL 98: Digital Detective" },
+      { property: "og:title", content: "SQL 98: Digital Detective" },
+      {
+        property: "og:description",
+        content:
+          "Investigate emails, case files and fake computer records in a Windows 98-inspired SQL mystery game.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {

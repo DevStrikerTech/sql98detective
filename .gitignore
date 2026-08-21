@@ -15,6 +15,9 @@ dist-ssr
 .tanstack/**
 .nitro
 *.local
+.env
+.env.*
+!.env.example
 
 # Wrangler / Cloudflare
 .wrangler/
@@ -30,9 +33,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-# Local dev config (machine-specific, not for collaboration)
-.claude/launch.json
 
 # Bun lockfile (project uses npm)
 bun.lock
