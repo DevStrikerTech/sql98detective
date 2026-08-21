@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { Win98Button } from "../Win98Button";
 import { Win98Icon } from "../Win98Icon";
 import { createSqlEngine, type SqlOutcome } from "@/lib/game/sqlEngine";
-import { revealScript, sqlTable } from "@/content/case001";
+import { proofBrief, revealScript, sqlTable, warrantScript } from "@/content/case001";
 import { useGameStore } from "@/lib/game/gameStore";
 import { useShellStore } from "@/lib/game/shellStore";
 
@@ -16,6 +16,7 @@ export function SqlExeApp() {
   const phase = useGameStore((s) => s.phase);
   const sqlUnlocked = useGameStore((s) => s.sqlUnlocked);
   const hintsUsed = useGameStore((s) => s.hintsUsed);
+  const discoveredCount = useGameStore((s) => s.discoveredClues.length);
   const consumeHint = useGameStore((s) => s.useHint);
   const revealCulprit = useGameStore((s) => s.revealCulprit);
   const solveCase = useGameStore((s) => s.solveCase);
@@ -33,6 +34,7 @@ export function SqlExeApp() {
   const [revealStep, setRevealStep] = useState(0);
   const outRef = useRef<HTMLDivElement>(null);
   const timers = useRef<number[]>([]);
+  const warrantDone = useRef(false);
 
   useEffect(
     () => () => {
@@ -44,6 +46,25 @@ export function SqlExeApp() {
   useEffect(() => {
     outRef.current?.scrollTo({ top: outRef.current.scrollHeight });
   }, [lines, result]);
+
+  // First time the warrant lands, the console reads itself in. Ceremony, one line at a time.
+  useEffect(() => {
+    if (!sqlUnlocked || warrantDone.current) return;
+    warrantDone.current = true;
+    setLines([...BOOT_LINES, ""]);
+    warrantScript.forEach((l, i) => {
+      timers.current.push(
+        window.setTimeout(() => {
+          setLines((prev) => [...prev, l]);
+          if (l) playCue("query");
+          if (i === warrantScript.length - 1) {
+            setLines((prev) => [...prev, "", "READY."]);
+            setStatus("WARRANT ACTIVE — AWAITING QUERY");
+          }
+        }, 260 + i * 340),
+      );
+    });
+  }, [sqlUnlocked, playCue]);
 
   if (!sqlUnlocked) {
     return (
@@ -58,6 +79,11 @@ export function SqlExeApp() {
             ? "No active investigation."
             : "Hint: the machine keeps logs. C:\\OFFICE\\LOGS\\"}
         </div>
+        {phase !== "idle" && phase !== "offered" && (
+          <div className="win98-in bg-terminal px-3 py-1 text-[12px] tracking-[0.14em]">
+            EXHIBITS SECURED {discoveredCount} — WARRANT PENDING
+          </div>
+        )}
         <div className="mt-2 text-[12px]">
           {"C:\\PRECINCT>"} <span className="anim-blink">_</span>
         </div>
@@ -154,6 +180,18 @@ export function SqlExeApp() {
 
       <div className="win98-groove shrink-0 bg-surface px-2 py-1 text-[11px]">
         <b>INVESTIGATION QUERY:</b> Find the user who deleted payroll.xls.
+      </div>
+
+      {/* Suspicion on the left, proof on the right. The gap between them is the game. */}
+      <div className="win98-groove grid shrink-0 grid-cols-2 gap-[3px] bg-surface p-[3px]">
+        {proofBrief.map((b) => (
+          <div key={b.heading} className="win98-field px-2 py-1">
+            <div className="text-[11px] font-bold tracking-[0.14em] text-ink-disabled">
+              {b.heading}
+            </div>
+            <div className="text-[11px] leading-[1.4] text-ink">{b.line}</div>
+          </div>
+        ))}
       </div>
 
       <div className="shrink-0">

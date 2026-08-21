@@ -30,13 +30,13 @@ export function currentObjective(args: {
   if (phase === "revealed")
     return {
       code: "OBJ-04",
-      text: "You have the name. Say it out loud, on the record.",
+      text: "The log said it out loud. Now you do. On the record, no hedging.",
       where: "SQL.exe",
     };
   if (sqlUnlocked)
     return {
       code: "OBJ-03",
-      text: "Ask the records who deleted payroll.xls. Politely, in SQL.",
+      text: "Suspicion is free. Proof costs one query. Ask who deleted payroll.xls.",
       where: "SQL.exe",
     };
   if (discoveredCount === 0)
