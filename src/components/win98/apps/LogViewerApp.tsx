@@ -123,9 +123,27 @@ export function LogViewerApp() {
         </div>
         <div className="flex justify-between text-[11px] text-ink-disabled">
           <span>09:10</span>
+          <span>one tick = one record. Click to pull it.</span>
           <span>09:25</span>
         </div>
       </div>
+
+      {/* A WHERE clause you can click. Same instinct, fewer semicolons. */}
+      <label className="win98-groove flex shrink-0 cursor-default items-center gap-2 bg-surface px-2 py-1 text-[11px] text-ink">
+        <input
+          type="checkbox"
+          checked={payrollOnly}
+          onChange={(e) => {
+            setPayrollOnly(e.target.checked);
+            playCue("query");
+          }}
+        />
+        Show only records for <span className="font-mono">payroll.xls</span>
+        <span className="ml-auto text-ink-disabled">
+          {payrollOnly ? `filtered — ${rows.length} of ${accessLogs.length}` : "unfiltered"}
+        </span>
+      </label>
+
       <div className="win98-field win98-scroll min-h-0 flex-1 overflow-auto">
         <table className="w-full border-collapse text-[11px]">
           <thead>
