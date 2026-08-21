@@ -263,6 +263,51 @@ export function CaseFilesApp({ onRequest }: { onRequest: (what: string) => void 
                           <div className="text-[11px] text-ink-disabled">
                             <b className="text-ink">NOTE:</b> {s.tell}
                           </div>
+
+                          <div className="mt-[6px] flex items-center gap-2">
+                            <span className="text-[11px] tracking-[0.1em] text-ink-disabled">
+                              PRESSURE
+                            </span>
+                            <div className="win98-in flex h-[10px] flex-1 gap-[1px] bg-field p-[1px]">
+                              {clues.map((c, i) => (
+                                <span
+                                  key={c.id}
+                                  className={cn(
+                                    "flex-1",
+                                    i < observed.length
+                                      ? busted
+                                        ? "bg-destructive"
+                                        : "bg-title"
+                                      : "bg-transparent",
+                                  )}
+                                />
+                              ))}
+                            </div>
+                            <span
+                              className={cn(
+                                "text-[11px] font-bold",
+                                busted ? "text-destructive" : "text-ink-disabled",
+                              )}
+                            >
+                              {observed.length}/{clues.length}
+                            </span>
+                          </div>
+
+                          {observed.length > 0 && (
+                            <div className="win98-in anim-redraw mt-1 bg-field p-[5px]">
+                              <div className="mb-[2px] text-[11px] tracking-[0.1em] text-ink-disabled">
+                                INTERVIEW ROOM — OBSERVED
+                              </div>
+                              {observed.map((line, i) => (
+                                <div
+                                  key={i}
+                                  className="border-l-2 border-surface-shadow pl-2 text-[11px] leading-[1.5] text-ink"
+                                >
+                                  {line}
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
                       {busted && (
