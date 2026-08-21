@@ -47,9 +47,12 @@ export function currentObjective(args: {
   // Lean cases collect their clues by pursuing leads in the Case Files app.
   if (caseConfig?.leads) {
     const total = caseConfig.leads.length;
+    const next = caseConfig.leads[discoveredCount];
     return {
       code: "OBJ-01",
-      text: `Pursue the leads and file the evidence — ${discoveredCount} of ${total} so far.`,
+      text: next
+        ? `Legwork, not hard drives. Work the lead board in Case Files — ${next.label}. (${discoveredCount}/${total} filed)`
+        : `Every lead filed — ${discoveredCount} of ${total}. The warrant is next.`,
       where: "Case Files",
     };
   }
