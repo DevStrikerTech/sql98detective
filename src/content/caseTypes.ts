@@ -78,4 +78,7 @@ export type CaseConfig = {
    * clues by pursuing these leads in the Case Files app.
    */
   leads?: CaseLead[];
+
+  /** Idle desk noise along the foot of the lead board. Lean cases only. */
+  leadsChatter?: string[];
 };
