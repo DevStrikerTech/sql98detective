@@ -433,3 +433,37 @@ export const mailActions: { label: string; title: string; message: string }[] = 
       "PRN1: paper jam.\nPRN2: is the good printer, and is lying about being the good printer.\n\nNo pages were harmed.",
   },
 ];
+
+/**
+ * Handwritten follow-up the detective scribbles on the folder margin once an
+ * exhibit is filed. Narrative only — never names the culprit before SQL does.
+ */
+export const clueNotes: Record<
+  ClueId,
+  { filedAt: string; note: string; lead: string }
+> = {
+  "payroll-missing": {
+    filedAt: "09:52",
+    note: "Gone, not moved. Nobody drags a file into thin air by accident.",
+    lead: "If the file left a hole, the machine wrote down who dug it.",
+  },
+  "access-logs": {
+    filedAt: "10:04",
+    note: "Six operations before the second coffee. This office types faster than it thinks.",
+    lead: "Read every row. Somebody is in there twice.",
+  },
+  "kevin-timing": {
+    filedAt: "10:19",
+    note: "A statement and a timestamp cannot both be true. Timestamps do not get nervous.",
+    lead: "Stop reading rows one at a time. Ask the table properly.",
+  },
+};
+
+/** Rotating flavour for the Case Files status bar. */
+export const dossierChatter: string[] = [
+  "Folder condition: coffee ring, upper right.",
+  "Evidence locker key is on the hook. Probably.",
+  "Chief Brannigan walked past. Did not look in.",
+  "Carbon copy filed with Records. Records lost it.",
+  "Typewriter ribbon low. Press harder.",
+];
