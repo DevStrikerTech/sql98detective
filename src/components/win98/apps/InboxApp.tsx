@@ -103,11 +103,30 @@ export function InboxApp() {
         </span>
       </div>
 
+      {/* A toolbar of buttons that all, in their own way, refuse. */}
+      <div className="flex shrink-0 flex-wrap items-center gap-[3px]">
+        {mailActions.map((a) => (
+          <Win98Button
+            key={a.label}
+            className="px-2"
+            onClick={() => {
+              playCue("error");
+              showDialog({ title: a.title, message: a.message, icon: "warning" });
+            }}
+          >
+            {a.label}
+          </Win98Button>
+        ))}
+        <span className="ml-auto pr-1 text-[11px] text-ink-disabled">
+          Mailbox: DETECTIVE (shared)
+        </span>
+      </div>
+
       <div className="win98-field win98-scroll h-[120px] overflow-auto">
         <table className="w-full border-collapse text-[11px]">
           <thead>
             <tr>
-              {["From", "Subject", "Received"].map((h) => (
+              {["!", "From", "Subject", "Received"].map((h) => (
                 <th
                   key={h}
                   className="win98-out sticky top-0 bg-surface px-[4px] py-[2px] text-left font-normal"
