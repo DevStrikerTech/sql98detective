@@ -137,7 +137,7 @@ export function SqlExeApp() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           spellCheck={false}
-          className="win98-field win98-scroll h-[66px] w-full resize-none p-[3px] font-mono text-[12px] text-ink outline-none"
+          className="win98-field win98-scroll h-[54px] w-full resize-none p-[3px] font-mono text-[12px] text-ink outline-none"
           style={running ? { cursor: "wait" } : undefined}
         />
       </div>
