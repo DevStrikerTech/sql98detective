@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { Win98Button } from "../Win98Button";
 import { Win98Icon } from "../Win98Icon";
 import { createSqlEngine, type SqlOutcome } from "@/lib/game/sqlEngine";
-import { sqlTable } from "@/content/case001";
+import { revealScript, sqlTable } from "@/content/case001";
 import { useGameStore } from "@/lib/game/gameStore";
 import { useShellStore } from "@/lib/game/shellStore";
 
@@ -100,12 +100,13 @@ export function SqlExeApp() {
             playCue("evidence");
             fireScreenFx("flicker");
             // Let the accusation land one beat at a time.
-            [800, 1750, 2700, 3700].forEach((ms, i) => {
+            [800, 1700, 2600, 3450, 4400].forEach((ms, i, arr) => {
+              const last = i === arr.length - 1;
               timers.current.push(
                 window.setTimeout(() => {
                   setRevealStep(i + 1);
-                  playCue(i === 3 ? "solved" : "query");
-                  if (i === 3) fireScreenFx("flicker");
+                  playCue(last ? "solved" : "query");
+                  if (last) fireScreenFx("flicker");
                 }, ms),
               );
             });
@@ -216,24 +217,18 @@ export function SqlExeApp() {
 
         {result?.correct && revealStep > 0 && (
           <div className="mt-3 border-t border-terminal-ink/40 pt-2">
-            {[
-              "1 row returned. Interesting.",
-              'Kevin, on record: "I never touched payroll.xls. Not once."',
-              "The log, on record: 09:21:04 — DELETE — kevin — payroll.xls.",
-              ">>> ONE NAME MATCHES. ONE NAME LIED. <<<",
-            ]
-              .slice(0, revealStep)
-              .map((t, i) => (
-                <div
-                  key={t}
-                  className={cn(
-                    "anim-typeout",
-                    i === 3 && "mt-1 anim-flicker text-[13px] font-bold tracking-[0.12em]",
-                  )}
-                >
-                  {t}
-                </div>
-              ))}
+            {revealScript.slice(0, revealStep).map((t, i) => (
+              <div
+                key={t}
+                className={cn(
+                  "anim-typeout",
+                  i === revealScript.length - 1 &&
+                    "mt-1 anim-flicker text-[13px] font-bold tracking-[0.12em]",
+                )}
+              >
+                {t}
+              </div>
+            ))}
           </div>
         )}
 
@@ -253,7 +248,7 @@ export function SqlExeApp() {
         >
           {status}
         </div>
-        {result?.correct && revealStep >= 4 && phase !== "solved" && (
+        {result?.correct && revealStep >= revealScript.length && phase !== "solved" && (
           <Win98Button
             className="anim-pulse-border font-bold tracking-[0.1em]"
             onClick={() => {

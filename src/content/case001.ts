@@ -239,7 +239,7 @@ export const caseEmail = {
   from: "Chief Brannigan",
   subject: "URGENT!!! payroll.xls IS GONE",
   date: "8/24/98 09:34",
-  body: 'Someone deleted payroll.xls this morning.\n\nAccounting is panicking.\nFinance is blaming IT.\nIT is blaming Gary.\nGary says he "doesn\'t even know what a spreadsheet is."\n\nFind out what happened.\n\n— Chief Brannigan',
+  body: 'DETECTIVE.\n\nAt 09:21 this morning payroll.xls stopped existing.\n\nAccounting is panicking. Finance is blaming IT. IT is blaming Gary.\nGary says he "doesn\'t even know what a spreadsheet is."\nSomebody on this floor is lying to me before ten in the morning.\n\nThree people touched that machine. Three people have a story.\nStories are free. The machine keeps receipts.\n\nFind me the name. Do not guess. I have been burned by a guess.\n\n— Chief Brannigan\n  (typing this standing up, which should tell you something)',
 };
 
 export const solutionQuery =
@@ -280,6 +280,29 @@ export const precinctChatter: string[] = [
   "The fern by Desk 4 has been declared a fire hazard.",
   "Chief Brannigan is pacing. Audibly.",
   "Screensaver Training Module 3: Flying Toasters. 14:00.",
+  "Desk 9 has requested a second desk fan. Denied.",
+  "Accounting has begun writing payroll out by hand. Badly.",
+  "Someone in IT is whistling. It is not going well.",
+  "Lost property: one mouse ball. Enquire at the front desk.",
+  "Kevin has asked twice whether logs 'expire'. They do not.",
+  "The good printer is not the good printer any more.",
+];
+
+/** Closing beats printed after the CASE CLOSED stamp. Epilogue, not logic. */
+export const caseEpilogue: string[] = [
+  "KEVIN — escorted to the break room. Confessed between two custard creams.",
+  "LINDA — vindicated. Has requested this in writing. Twice.",
+  "GARY — still guilty of something. Not this.",
+  "payroll.xls — recovered from a floppy labelled 'DO NOT'.",
+];
+
+/** The SQL console's accusation, delivered one beat at a time. */
+export const revealScript: string[] = [
+  "1 row returned. That is a small number for a big morning.",
+  'KEVIN, on record: "I never touched payroll.xls. Not once."',
+  "THE LOG, on record: 09:21 — DELETE — kevin — payroll.xls.",
+  "Two statements. One machine. Machines do not get nervous.",
+  ">>> ONE NAME MATCHES. ONE NAME LIED. <<<",
 ];
 
 /** Follow-up mail that lands as the case progresses. Purely narrative. */
@@ -310,6 +333,14 @@ export const caseFollowUps: {
     showAfter: "accepted",
   },
   {
+    id: "chief-nudge",
+    from: "Chief Brannigan",
+    subject: "well?",
+    date: "8/24/98 09:49",
+    body: "Detective.\n\nI am not rushing you. I am simply standing near your desk, breathing.\n\nThe machine writes everything down. Look at what it wrote.\n\n— Chief",
+    showAfter: "accepted",
+  },
+  {
     id: "it-audit",
     from: "IT Department",
     subject: "RE: audit trail request",
@@ -324,6 +355,14 @@ export const caseFollowUps: {
     date: "8/24/98 09:58",
     body: "hey so hypothetically\n\nif a log file said someone did something, could the log be wrong? like a clock issue? or a haunting?\n\nasking for the machine\n\n- Kevin",
     showAfter: "sql",
+  },
+  {
+    id: "linda-vindicated",
+    from: "Linda (Accounting)",
+    subject: "RE: I want it on record",
+    date: "8/24/98 10:21",
+    body: "Detective,\n\nI have been told the matter is resolved. I would like a copy of the log entry showing 09:15, CLOSE, linda.\n\nLaminated, if the machine allows.\n\n— Linda",
+    showAfter: "solved",
   },
   {
     id: "chief-congrats",
