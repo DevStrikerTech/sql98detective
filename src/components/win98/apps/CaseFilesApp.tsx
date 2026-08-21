@@ -235,6 +235,11 @@ export function CaseFilesApp({ onRequest }: { onRequest: (what: string) => void 
               <div className="anim-redraw mt-2 space-y-2">
                 {suspects.map((s) => {
                   const busted = !!s.contradictedBy && discovered.includes(s.contradictedBy);
+                  const notes = suspectObservations[s.id] ?? {};
+                  const observed = clues
+                    .filter((c) => discovered.includes(c.id))
+                    .map((c) => notes[c.id])
+                    .filter((n): n is string => !!n);
                   return (
                     <div key={s.id} className="win98-groove relative bg-surface p-2">
                       <div className="flex gap-2">
