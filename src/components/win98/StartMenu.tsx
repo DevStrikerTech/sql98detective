@@ -46,11 +46,6 @@ export function StartMenu({
     { label: "Run...", icon: "sql-exe", action: () => onNotImplemented("Run") },
   ];
 
-  const caseItems: Item[] = cases.map((c) => ({
-    label: `Case ${c.id} — ${c.title}`,
-    icon: "case-files",
-    action: () => onLoadCase(c.id),
-  }));
 
   return (
     <div className="win98-out anim-snap-open absolute bottom-[28px] left-0 z-[8600] flex w-[240px] bg-surface p-[3px]">
