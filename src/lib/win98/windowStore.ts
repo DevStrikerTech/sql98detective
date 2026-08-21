@@ -27,8 +27,8 @@ export type AppDef = {
 export const APPS: Record<AppId, AppDef> = {
   "my-computer": { title: "My Computer", icon: "my-computer", width: 480, height: 320 },
   inbox: { title: "Inbox - Detective Mail", icon: "inbox", width: 560, height: 360 },
-  "case-files": { title: "Case Files", icon: "case-files", width: 420, height: 260 },
-  "sql-exe": { title: "SQL.exe", icon: "sql-exe", width: 540, height: 340 },
+  "case-files": { title: "Case Files", icon: "case-files", width: 520, height: 430 },
+  "sql-exe": { title: "SQL.exe", icon: "sql-exe", width: 560, height: 430 },
   "recycle-bin": { title: "Recycle Bin", icon: "recycle-bin", width: 460, height: 300 },
   "log-viewer": { title: "ACCESS_LOGS.DAT - Log Viewer", icon: "document", width: 470, height: 300 },
   about: { title: "About SQL 98", icon: "info", width: 380, height: 230 },
