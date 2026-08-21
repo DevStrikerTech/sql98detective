@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { Win98Icon } from "./Win98Icon";
 import { useGameStore } from "@/lib/game/gameStore";
 import { currentObjective } from "@/lib/game/objective";
-import { CASE_ID } from "@/content/case001";
+import { CASE_ID, clues } from "@/content/case001";
 
 /**
  * A pinned "note to self" strip above the taskbar. In-universe guidance:
@@ -53,8 +53,11 @@ export function ObjectiveTicker() {
               <span className="anim-blink mr-1 font-bold">▸</span>
               {obj.text}
             </div>
-            <div className="mt-1 text-[11px] tracking-[0.1em] text-ink-disabled">
-              LOCATION: {obj.where.toUpperCase()}
+            <div className="mt-1 flex items-center justify-between gap-2 text-[11px] tracking-[0.1em] text-ink-disabled">
+              <span>LOCATION: {obj.where.toUpperCase()}</span>
+              <span className="font-bold text-ink">
+                {clues.map((c) => (discovered.includes(c.id) ? "■" : "□")).join(" ")}
+              </span>
             </div>
           </div>
         )}
