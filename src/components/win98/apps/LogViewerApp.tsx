@@ -47,6 +47,7 @@ export function LogViewerApp() {
         const clue = clues.find((c) => c.id === "kevin-timing");
         fireScreenFx("flicker");
         playCue("evidence");
+        setFlashApp("case-files");
         logEvidence({
           label: clue?.label ?? "Kevin's record",
           detail: clue?.detail ?? `DELETE payroll.xls @ ${row.time}`,

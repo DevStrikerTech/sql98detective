@@ -26,6 +26,7 @@ export function MyComputerApp() {
   const say = useShellStore((s) => s.say);
   const playCue = useShellStore((s) => s.playCue);
   const logEvidence = useShellStore((s) => s.logEvidence);
+  const setFlashApp = useShellStore((s) => s.setFlashApp);
   const fireScreenFx = useShellStore((s) => s.fireScreenFx);
   const discoveredClues = useGameStore((s) => s.discoveredClues);
   const discoveredCount = discoveredClues.length;
@@ -57,6 +58,7 @@ export function MyComputerApp() {
     const clue = clues.find((c) => c.id === clueId);
     fireScreenFx("flicker");
     playCue("evidence");
+    setFlashApp("case-files");
     logEvidence({
       label: clue?.label ?? "New evidence",
       detail: clue?.detail ?? "",
