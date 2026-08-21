@@ -6,6 +6,9 @@ import { StartMenu } from "./StartMenu";
 import { Win98Dialog } from "./Win98Dialog";
 import { Assistant } from "./Assistant";
 import { CaseClosed } from "./CaseClosed";
+import { EvidenceToast } from "./EvidenceToast";
+import { ObjectiveTicker } from "./ObjectiveTicker";
+import { ScreenFxLayer } from "./ScreenFxLayer";
 import { MyComputerApp } from "./apps/MyComputerApp";
 import { InboxApp } from "./apps/InboxApp";
 import { CaseFilesApp } from "./apps/CaseFilesApp";
@@ -170,6 +173,9 @@ export function Desktop() {
         onTaskClick={toggleFromTaskbar}
       />
 
+      <ObjectiveTicker />
+      <EvidenceToast />
+      <ScreenFxLayer />
       <Assistant />
 
       {dialog && (
