@@ -1,34 +1,141 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Win98Icon } from "../Win98Icon";
-import { drives } from "@/content/drives";
+import { Win98Button } from "../Win98Button";
+import { fileSystem, type FsNode } from "@/content/case001";
+import { useGameStore } from "@/lib/game/gameStore";
+import { useShellStore } from "@/lib/game/shellStore";
+import { useWindowStore } from "@/lib/win98/windowStore";
 
 export function MyComputerApp() {
+  const [path, setPath] = useState<FsNode[]>([]);
   const [sel, setSel] = useState<string | null>(null);
+
+  const phase = useGameStore((s) => s.phase);
+  const discoverClue = useGameStore((s) => s.discoverClue);
+  const showDialog = useShellStore((s) => s.showDialog);
+  const say = useShellStore((s) => s.say);
+  const playCue = useShellStore((s) => s.playCue);
+  const openWindow = useWindowStore((s) => s.open);
+
+  const items = path.length === 0 ? fileSystem : (path[path.length - 1]!.children ?? []);
+  const location =
+    path.length === 0 ? "My Computer" : "C:\\" + path.slice(1).map((n) => n.name).join("\\");
+  const selected = items.find((i) => i.name === sel) ?? null;
+  const investigating = phase !== "idle" && phase !== "offered";
+
+  const openNode = (node: FsNode) => {
+    if (node.children) {
+      setPath([...path, node]);
+      setSel(null);
+      return;
+    }
+    inspect(node);
+  };
+
+  const inspect = (node: FsNode) => {
+    playCue("evidence");
+    switch (node.action) {
+      case "inspect-payroll": {
+        const isNew = investigating && discoverClue("payroll-missing");
+        showDialog({
+          title: isNew ? "Evidence Found" : "payroll.xls - Properties",
+          message:
+            "payroll.xls\n\nStatus: FILE NOT FOUND\nLast known location: C:\\OFFICE\\DOCUMENTS\\payroll.xls\nLast modified: 09:21 AM\n\n" +
+            (isNew
+              ? "The file was removed, not moved. Something recorded the moment it happened."
+              : "Still missing. Still 09:21."),
+          icon: "warning",
+          okLabel: isNew ? "ADD TO CASE FILE" : "OK",
+        });
+        if (isNew) say("Deleted at 09:21. Suspiciously precise for an accident.");
+        break;
+      }
+      case "open-logs": {
+        const isNew = investigating && discoverClue("access-logs");
+        openWindow("log-viewer");
+        if (isNew) {
+          showDialog({
+            title: "EVIDENCE FOUND",
+            message:
+              "File access records contain activity for payroll.xls.\n\nSix operations were logged this morning between 09:11 and 09:23.",
+            icon: "case-files",
+            okLabel: "ADD TO CASE FILE",
+          });
+        }
+        break;
+      }
+      case "gary-download": {
+        showDialog({
+          title: "Cannot Open File",
+          message: `${node.name}\n\n${node.detail}\n\nThis machine refuses to run it, and honestly, good.`,
+          icon: "warning",
+        });
+        say("Evidence of questionable musical taste. Not necessarily evidence of spreadsheet murder.");
+        break;
+      }
+      default:
+        showDialog({
+          title: `${node.name} - Properties`,
+          message: `${node.name}\n\n${node.detail}`,
+          icon: node.kind === "folder" ? "folder" : "document",
+        });
+    }
+  };
+
   return (
-    <div className="win98-field win98-scroll flex-1 overflow-auto p-2">
-      <div className="flex flex-wrap content-start gap-[2px]">
-        {drives.map((d) => (
-          <button
-            key={d.name}
-            type="button"
-            onClick={() => setSel(d.name)}
-            className="flex w-[110px] flex-col items-center gap-1 p-2 text-center"
-          >
-            <Win98Icon name={d.icon} size={32} />
-            <span
-              className={cn(
-                "px-[2px] text-[11px] leading-tight",
-                sel === d.name ? "bg-select text-select-ink" : "text-ink",
-              )}
-            >
-              {d.name}
-            </span>
-          </button>
-        ))}
+    <div className="flex min-h-0 flex-1 flex-col gap-[3px]">
+      <div className="flex shrink-0 items-center gap-2">
+        <Win98Button
+          className="min-w-0 px-2"
+          disabled={path.length === 0}
+          onClick={() => {
+            setPath(path.slice(0, -1));
+            setSel(null);
+          }}
+        >
+          ↑ Up
+        </Win98Button>
+        <span className="text-[11px] text-ink">Address:</span>
+        <div className="win98-field flex-1 truncate px-[4px] py-[2px] text-[11px] text-ink">
+          {location}
+        </div>
       </div>
-      <div className="mt-3 border-t border-surface-shadow pt-2 text-[11px] text-ink-disabled">
-        {sel ? drives.find((d) => d.name === sel)?.detail : "7 object(s)"}
+
+      <div className="win98-field win98-scroll min-h-0 flex-1 overflow-auto p-2">
+        <div className="flex flex-wrap content-start gap-[2px]">
+          {items.map((d) => (
+            <button
+              key={d.name}
+              type="button"
+              onClick={() => setSel(d.name)}
+              onDoubleClick={() => openNode(d)}
+              className="flex w-[112px] flex-col items-center gap-1 p-2 text-center"
+            >
+              <span className={cn(d.missing && "opacity-40 anim-blink")}>
+                <Win98Icon name={d.icon} size={32} />
+              </span>
+              <span
+                className={cn(
+                  "px-[2px] text-[11px] leading-tight break-words",
+                  sel === d.name ? "bg-select text-select-ink" : "text-ink",
+                  d.missing && sel !== d.name && "text-ink-disabled line-through",
+                )}
+              >
+                {d.name}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex shrink-0 items-center gap-2">
+        <div className="win98-in flex-1 truncate px-[5px] py-[2px] text-[11px] text-ink-disabled">
+          {selected ? selected.detail : `${items.length} object(s)`}
+        </div>
+        <Win98Button disabled={!selected} onClick={() => selected && openNode(selected)}>
+          Open
+        </Win98Button>
       </div>
     </div>
   );
