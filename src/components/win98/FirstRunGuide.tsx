@@ -6,9 +6,11 @@ type Props = {
 };
 
 const LINES = [
-  "Name's Byte. I sniff out trouble so you don't have to guess.",
-  "Check the Inbox. Poke the files. When you're sure, open SQL.exe and prove it.",
+  "Name's Byte. Precinct sniffer. I find the smell, you find the name.",
+  "Read the Inbox first. Then poke around the machine — files remember things people forget.",
+  "When you're sure, open SQL.exe and make the record say it out loud.",
 ];
+
 
 const DOG_FRAMES = [
   ` / \\__
