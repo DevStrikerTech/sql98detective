@@ -86,17 +86,21 @@ function playSequence(notes: Note[]) {
 }
 
 const BOOT_THEME: Note[] = [
-  { f: 523, d: 80, gain: 0.045 },
-  { f: 659, d: 80, gain: 0.045 },
-  { f: 784, d: 120, gain: 0.05 },
-  { f: 0, d: 40 },
-  { f: 784, d: 80, gain: 0.045 },
-  { f: 988, d: 80, gain: 0.045 },
-  { f: 1174, d: 140, gain: 0.05 },
-  { f: 0, d: 60 },
-  { f: 1046, d: 120, type: "triangle", gain: 0.035 },
-  { f: 1174, d: 120, type: "triangle", gain: 0.035 },
-  { f: 1318, d: 220, type: "triangle", gain: 0.04 },
+  { f: 392, d: 70, gain: 0.04 },
+  { f: 523, d: 70, gain: 0.04 },
+  { f: 659, d: 70, gain: 0.045 },
+  { f: 784, d: 110, gain: 0.05 },
+  { f: 0, d: 35 },
+  { f: 659, d: 60, gain: 0.04 },
+  { f: 784, d: 60, gain: 0.045 },
+  { f: 988, d: 70, gain: 0.045 },
+  { f: 1174, d: 130, gain: 0.05 },
+  { f: 0, d: 45 },
+  { f: 1046, d: 60, type: "triangle", gain: 0.03 },
+  { f: 784, d: 60, type: "triangle", gain: 0.03 },
+  { f: 880, d: 70, gain: 0.04 },
+  { f: 1046, d: 70, gain: 0.045 },
+  { f: 1318, d: 180, gain: 0.05 },
 ];
 
 export function playCueSound(cue: SoundCue) {
