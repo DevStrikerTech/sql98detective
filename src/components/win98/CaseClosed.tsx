@@ -28,10 +28,9 @@ export function CaseClosed({ onDismiss }: { onDismiss: () => void }) {
     ["DECISIVE TOOL", "SELECT · WHERE · AND"],
     ["TIME", time],
     ["HINTS USED", String(hintsUsed)],
-    ["CHIEF'S NOTE", "\"Good work. Do not touch the donut case.\""],
+    ["CHIEF'S NOTE", '"Good work. Do not touch the donut case."'],
     ["RANK", hintsUsed === 0 ? "DETECTIVE FIRST CLASS" : "DETECTIVE"],
   ];
-
 
   useEffect(() => {
     const timers: number[] = [];

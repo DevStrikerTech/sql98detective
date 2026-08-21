@@ -36,6 +36,7 @@ const FIELD_ALIASES: Record<string, keyof AccessLog> = {
   file: "file",
   action: "action",
   time: "time",
+  timestamp: "time",
   id: "id",
 };
 
@@ -89,7 +90,7 @@ export function createSqlEngine(config: SqlTableConfig) {
     if (bad) {
       return err(
         "UNKNOWN COLUMN",
-        `Column '${bad}' does not exist. Columns: id, username, filename, action, time`,
+        `Column '${bad}' does not exist. Columns: id, username, filename, action, timestamp`,
         "Close. Wrong column though.",
       );
     }

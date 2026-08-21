@@ -105,9 +105,7 @@ export function LogViewerApp() {
                   sel === r.id ? "bg-select text-select-ink" : "text-ink",
                 )}
               >
-                <td className="w-[16px] px-[3px] py-[1px]">
-                  {examined.includes(r.id) ? "»" : ""}
-                </td>
+                <td className="w-[16px] px-[3px] py-[1px]">{examined.includes(r.id) ? "»" : ""}</td>
                 <td className="px-[4px] py-[1px]">{r.id}</td>
                 <td className="px-[4px] py-[1px]">{r.user}</td>
                 <td className="px-[4px] py-[1px]">{r.file}</td>

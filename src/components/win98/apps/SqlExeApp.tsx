@@ -101,7 +101,6 @@ export function SqlExeApp() {
             fireScreenFx("flicker");
             // Let the accusation land one beat at a time.
             [800, 1750, 2700, 3700].forEach((ms, i) => {
-
               timers.current.push(
                 window.setTimeout(() => {
                   setRevealStep(i + 1);
@@ -219,7 +218,7 @@ export function SqlExeApp() {
           <div className="mt-3 border-t border-terminal-ink/40 pt-2">
             {[
               "1 row returned. Interesting.",
-              "Kevin, on record: \"I never touched payroll.xls. Not once.\"",
+              'Kevin, on record: "I never touched payroll.xls. Not once."',
               "The log, on record: 09:21:04 — DELETE — kevin — payroll.xls.",
               ">>> ONE NAME MATCHES. ONE NAME LIED. <<<",
             ]
@@ -237,7 +236,6 @@ export function SqlExeApp() {
               ))}
           </div>
         )}
-
 
         {!running && (
           <div className="mt-2">

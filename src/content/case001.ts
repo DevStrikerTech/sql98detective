@@ -51,7 +51,6 @@ export const suspects: Suspect[] = [
   },
 ];
 
-
 export type ClueId = "payroll-missing" | "access-logs" | "kevin-timing";
 
 export type Clue = {
