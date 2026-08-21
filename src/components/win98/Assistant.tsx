@@ -65,11 +65,16 @@ export function Assistant() {
           </button>
         </div>
         <div className="flex gap-2 p-2">
-          <Win98Icon name="sql-exe" size={24} />
+          <span className="anim-blink-slow shrink-0">
+            <Win98Icon name="sql-exe" size={24} />
+          </span>
           <p className="min-h-[42px] flex-1 text-[11px] leading-[1.45] text-ink">
             {typed}
             <span className="anim-blink">_</span>
           </p>
+        </div>
+        <div className="win98-in mx-[3px] mb-[3px] truncate px-[4px] py-[1px] text-[11px] text-ink-disabled">
+          QUERY.hlp — unhelpful since 1997
         </div>
       </div>
     </div>
