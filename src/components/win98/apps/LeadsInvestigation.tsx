@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Win98Button } from "../Win98Button";
 import { Win98Icon } from "../Win98Icon";
@@ -46,7 +46,34 @@ export function LeadsInvestigation({ caseConfig }: { caseConfig: CaseConfig }) {
   const [pursuing, setPursuing] = useState<string | null>(null);
   const [justFiled, setJustFiled] = useState<string | null>(null);
 
-  const file = (lead: CaseLead) => {
+  /* Timer refs so both delays can be cancelled on case change or unmount. */
+  const pursuitTimer = useRef<number | null>(null);
+  const sqlDialogTimer = useRef<number | null>(null);
+
+  /* Clear timers and reset transient UI whenever the active case changes. */
+  useEffect(() => {
+    if (pursuitTimer.current !== null) {
+      window.clearTimeout(pursuitTimer.current);
+      pursuitTimer.current = null;
+    }
+    if (sqlDialogTimer.current !== null) {
+      window.clearTimeout(sqlDialogTimer.current);
+      sqlDialogTimer.current = null;
+    }
+    setPursuing(null);
+    setJustFiled(null);
+  }, [caseConfig.id]);
+
+  /* Cleanup on unmount. */
+  useEffect(() => {
+    return () => {
+      if (pursuitTimer.current !== null) window.clearTimeout(pursuitTimer.current);
+      if (sqlDialogTimer.current !== null) window.clearTimeout(sqlDialogTimer.current);
+    };
+  }, []);
+
+  const file = (lead: CaseLead, scheduledForCaseId: string) => {
+    if (useGameStore.getState().currentCaseId !== scheduledForCaseId) return;
     if (!discoverClue(lead.clueId)) return;
     const clue = caseConfig.clues.find((c) => c.id === lead.clueId);
     fireScreenFx("flicker");
@@ -63,14 +90,18 @@ export function LeadsInvestigation({ caseConfig }: { caseConfig: CaseConfig }) {
       unlockSql();
       setFlashApp("sql-exe");
       openWindow("sql-exe");
-      window.setTimeout(() => {
+      const caseId = scheduledForCaseId;
+      const tableName = caseConfig.sqlTable.tableName;
+      sqlDialogTimer.current = window.setTimeout(() => {
+        sqlDialogTimer.current = null;
+        if (useGameStore.getState().currentCaseId !== caseId) return;
         fireScreenFx("flicker");
         playCue("query");
         showDialog({
           title: "DATABASE QUERY ACCESS ENABLED",
           message:
             "Sufficient evidence collected.\n\nSQL.exe may now interrogate " +
-            `${caseConfig.sqlTable.tableName}.\n\n` +
+            `${tableName}.\n\n` +
             "A lead is a rumour. A query result is testimony.",
           icon: "sql-exe",
           okLabel: "OPEN SQL.exe",
@@ -84,11 +115,13 @@ export function LeadsInvestigation({ caseConfig }: { caseConfig: CaseConfig }) {
 
   const pursue = (lead: CaseLead) => {
     if (discovered.includes(lead.clueId) || pursuing) return;
+    const caseId = caseConfig.id;
     setPursuing(lead.id);
     playCue("query");
-    window.setTimeout(() => {
+    pursuitTimer.current = window.setTimeout(() => {
+      pursuitTimer.current = null;
       setPursuing(null);
-      file(lead);
+      file(lead, caseId);
     }, 700);
   };
 
