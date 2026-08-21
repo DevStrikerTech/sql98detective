@@ -48,6 +48,29 @@ export function InboxApp() {
     setRead((r) => (r.includes(selectedId) ? r : [...r, selectedId]));
   }, [selectedId]);
 
+  /* The mail room mutters to itself between deliveries. */
+  const [chatter, setChatter] = useState(0);
+  useEffect(() => {
+    const id = window.setInterval(
+      () => setChatter((c) => (c + 1) % mailRoomChatter.length),
+      11000,
+    );
+    return () => window.clearInterval(id);
+  }, []);
+
+  /* Anything that lands while the window is open gets a brief NEW flag. */
+  const [seen, setSeen] = useState<string[]>(() => list.map((m) => m.id));
+  const [fresh, setFresh] = useState<string[]>([]);
+  useEffect(() => {
+    const arrivals = list.map((m) => m.id).filter((id) => !seen.includes(id));
+    if (arrivals.length === 0) return;
+    setSeen((s) => [...s, ...arrivals]);
+    setFresh(arrivals);
+    playCue("message");
+    const t = window.setTimeout(() => setFresh([]), 6000);
+    return () => window.clearTimeout(t);
+  }, [list, seen, playCue]);
+
   const mail = list.find((m) => m.id === selectedId) ?? list[0]!;
   const isCaseMail = mail.id === caseEmail.id;
   const unreadCount = list.filter((m) => !read.includes(m.id)).length;
