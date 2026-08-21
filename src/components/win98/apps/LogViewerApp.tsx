@@ -97,23 +97,23 @@ export function LogViewerApp() {
           THE MORNING — 09:10 TO 09:25
         </div>
         <div className="win98-in relative h-[22px] bg-field">
-          {accessLogs.map((r) => {
+          {accessLogs.map((r, idx) => {
             const [h, m] = r.time.split(":").map(Number);
-            const pct =
-              ((h! * 60 + m! - TIMELINE_START) / (TIMELINE_END - TIMELINE_START)) * 100;
-            const isDelete = r.action === "DELETE";
+            const pct = ((h! * 60 + m! - TIMELINE_START) / (TIMELINE_END - TIMELINE_START)) * 100;
+            const sameTimeBefore = accessLogs.slice(0, idx).filter((p) => p.time === r.time).length;
+            const isExamined = examined.includes(r.id);
             return (
               <button
                 key={r.id}
                 type="button"
-                title={`${r.time} — ${r.user} — ${r.action}`}
+                title={`RECORD #${r.id} — click to examine`}
                 onClick={() => inspectRow(r)}
-                style={{ left: `${pct}%` }}
+                style={{ left: `calc(${pct}% + ${sameTimeBefore * 9}px)` }}
                 className={cn(
                   "absolute top-[3px] h-[16px] w-[7px] -translate-x-1/2 border border-surface-shadow",
-                  isDelete ? "bg-destructive" : "bg-surface-hilite",
+                  isExamined && r.action === "DELETE" ? "bg-destructive" : "bg-surface-hilite",
                   sel === r.id && "anim-blink border-ink",
-                  !examined.includes(r.id) && "opacity-60",
+                  !isExamined && "opacity-60",
                 )}
               />
             );
