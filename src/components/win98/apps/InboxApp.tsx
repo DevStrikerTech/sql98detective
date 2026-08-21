@@ -219,7 +219,7 @@ export function InboxApp() {
 
       <div className="win98-in shrink-0 truncate px-[5px] py-[2px] text-[11px] text-ink-disabled">
         {list.length} message(s), {unreadCount} unread
-        {phase === "offered" ? " — the Chief is waiting." : ""}
+        {phase === "offered" ? " — the Chief is waiting." : ` — ${mailRoomChatter[chatter]}`}
       </div>
     </div>
   );
