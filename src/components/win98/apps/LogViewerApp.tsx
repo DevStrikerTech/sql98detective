@@ -35,6 +35,7 @@ export function LogViewerApp() {
   const openWindow = useWindowStore((s) => s.open);
   const investigating = phase !== "idle" && phase !== "offered";
 
+  const rows = payrollOnly ? accessLogs.filter((r) => r.file === "payroll.xls") : accessLogs;
   const selRow = accessLogs.find((r) => r.id === sel) ?? null;
   const selSuspect = selRow ? suspects.find((s) => s.id === selRow.user) : undefined;
 
@@ -159,7 +160,7 @@ export function LogViewerApp() {
             </tr>
           </thead>
           <tbody className="font-mono">
-            {accessLogs.map((r) => (
+            {rows.map((r) => (
               <tr
                 key={r.id}
                 onClick={() => inspectRow(r)}
