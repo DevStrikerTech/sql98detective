@@ -2,7 +2,16 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Win98Button } from "../Win98Button";
 import { Win98Icon } from "../Win98Icon";
-import { accessLogs, clues, logNotes, suspects, type AccessLog } from "@/content/case001";
+import {
+  accessLogs,
+  clues,
+  logCrossRefs,
+  logNotes,
+  suspects,
+  TIMELINE_END,
+  TIMELINE_START,
+  type AccessLog,
+} from "@/content/case001";
 import { useGameStore } from "@/lib/game/gameStore";
 import { useShellStore } from "@/lib/game/shellStore";
 import { useWindowStore } from "@/lib/win98/windowStore";
@@ -81,6 +90,40 @@ export function LogViewerApp() {
       <div className="win98-groove shrink-0 bg-surface px-2 py-1 text-[11px] text-ink">
         C:\OFFICE\LOGS\file_access.log — {accessLogs.length} records · {examined.length} examined
       </div>
+
+      {/* The morning, laid out end to end. Click a tick to pull the record. */}
+      <div className="win98-groove shrink-0 bg-surface px-2 pt-[3px] pb-1">
+        <div className="mb-[3px] text-[11px] tracking-[0.14em] text-ink-disabled">
+          THE MORNING — 09:10 TO 09:25
+        </div>
+        <div className="win98-in relative h-[22px] bg-field">
+          {accessLogs.map((r) => {
+            const [h, m] = r.time.split(":").map(Number);
+            const pct =
+              ((h! * 60 + m! - TIMELINE_START) / (TIMELINE_END - TIMELINE_START)) * 100;
+            const isDelete = r.action === "DELETE";
+            return (
+              <button
+                key={r.id}
+                type="button"
+                title={`${r.time} — ${r.user} — ${r.action}`}
+                onClick={() => inspectRow(r)}
+                style={{ left: `${pct}%` }}
+                className={cn(
+                  "absolute top-[3px] h-[16px] w-[7px] -translate-x-1/2 border border-surface-shadow",
+                  isDelete ? "bg-destructive" : "bg-surface-hilite",
+                  sel === r.id && "anim-blink border-ink",
+                  !examined.includes(r.id) && "opacity-60",
+                )}
+              />
+            );
+          })}
+        </div>
+        <div className="flex justify-between text-[11px] text-ink-disabled">
+          <span>09:10</span>
+          <span>09:25</span>
+        </div>
+      </div>
       <div className="win98-field win98-scroll min-h-0 flex-1 overflow-auto">
         <table className="w-full border-collapse text-[11px]">
           <thead>
@@ -134,6 +177,11 @@ export function LogViewerApp() {
                 RECORD #{selRow.id} — {selRow.user} · {selRow.action} · {selRow.time}
               </div>
               <div className="text-ink">{logNotes[selRow.id]}</div>
+              {logCrossRefs[selRow.id] && (
+                <div className="anim-typeout mt-[2px] border-l-2 border-surface-shadow pl-[5px] text-ink">
+                  {logCrossRefs[selRow.id]}
+                </div>
+              )}
               {selSuspect && (
                 <div className="mt-[2px] text-ink-disabled">
                   <b className="text-ink">{selSuspect.name} SAYS:</b> {selSuspect.statement}

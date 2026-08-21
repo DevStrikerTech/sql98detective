@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Win98Icon } from "./Win98Icon";
 import { useShellStore } from "@/lib/game/shellStore";
+import { useGameStore } from "@/lib/game/gameStore";
+import { assistantBarks } from "@/content/case001";
 
 /** QUERY — a small, dry desktop helper. Appears briefly, then goes away. */
 export function Assistant() {
@@ -23,6 +25,22 @@ export function Assistant() {
       window.clearTimeout(hide);
     };
   }, [line, clear]);
+
+  /* Idle muttering: QUERY gets bored while the detective reads. */
+  const say = useShellStore((s) => s.say);
+  const phase = useGameStore((s) => s.phase);
+  const lineRef = useRef(line);
+  lineRef.current = line;
+  useEffect(() => {
+    if (phase === "idle" || phase === "offered" || phase === "solved") return;
+    let n = 0;
+    const id = window.setInterval(() => {
+      if (lineRef.current) return;
+      say(assistantBarks[n % assistantBarks.length]!);
+      n += 1;
+    }, 42000);
+    return () => window.clearInterval(id);
+  }, [phase, say]);
 
   if (!line) return null;
 

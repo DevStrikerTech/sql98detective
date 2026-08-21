@@ -62,6 +62,18 @@ export function InboxApp() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-[3px]">
+      <div className="win98-groove flex shrink-0 items-center gap-2 bg-surface px-2 py-1 text-[11px]">
+        <Win98Icon name="mail" size={12} />
+        <span className="tracking-[0.14em] text-ink-disabled">PRECINCT MAIL SYSTEM v2.1</span>
+        <span className="ml-auto text-ink-disabled">
+          {phase === "offered" ? (
+            <span className="anim-blink font-bold text-ink">!! PRIORITY MAIL WAITING !!</span>
+          ) : (
+            "Delivery: whenever the server feels like it"
+          )}
+        </span>
+      </div>
+
       <div className="win98-field win98-scroll h-[120px] overflow-auto">
         <table className="w-full border-collapse text-[11px]">
           <thead>
