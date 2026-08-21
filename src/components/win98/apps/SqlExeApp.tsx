@@ -46,6 +46,26 @@ export function SqlExeApp() {
     [],
   );
 
+  // Case-switch reset: when the active case changes, wipe everything a
+  // previous case might have left behind — pending timers, warrant ceremony
+  // flag, query text, terminal lines, result rows, reveal progress, and the
+  // status line. Without this, keeping SQL.exe open across a case switch
+  // shows stale rows and could re-arm the solve button for a case whose
+  // evidence was never queried.
+  const caseId = caseConfig?.id ?? null;
+  const casePlaceholder = caseConfig?.sqlPlaceholder ?? "";
+  useEffect(() => {
+    timers.current.forEach((t) => clearTimeout(t));
+    timers.current = [];
+    warrantDone.current = false;
+    setQuery(casePlaceholder);
+    setLines([...BOOT_LINES, "", "READY."]);
+    setRunning(false);
+    setStatus("READY");
+    setResult(null);
+    setRevealStep(0);
+  }, [caseId, casePlaceholder]);
+
   useEffect(() => {
     outRef.current?.scrollTo({ top: outRef.current.scrollHeight });
   }, [lines, result]);

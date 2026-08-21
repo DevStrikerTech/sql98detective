@@ -20,6 +20,7 @@ export function LogViewerApp() {
   const [sel, setSel] = useState<number | null>(null);
   const [examined, setExamined] = useState<number[]>([]);
   const phase = useGameStore((s) => s.phase);
+  const activeCaseId = useGameStore((s) => s.currentCaseId);
   const discoverClue = useGameStore((s) => s.discoverClue);
   const sqlUnlocked = useGameStore((s) => s.sqlUnlocked);
   const unlockSql = useGameStore((s) => s.unlockSql);
@@ -31,7 +32,11 @@ export function LogViewerApp() {
   const fireScreenFx = useShellStore((s) => s.fireScreenFx);
   const discoveredCount = useGameStore((s) => s.discoveredClues.length);
   const openWindow = useWindowStore((s) => s.open);
-  const investigating = phase !== "idle" && phase !== "offered";
+  // The log content on screen is Case 001's morning; its clue and SQL-unlock
+  // mutations only make sense while Case 001 is the active investigation.
+  // If the player keeps this window open across a switch to another case,
+  // clicking these old rows must not touch that case's game state.
+  const investigating = activeCaseId === "001" && phase !== "idle" && phase !== "offered";
 
   const selRow = accessLogs.find((r) => r.id === sel) ?? null;
   const selSuspect = selRow ? suspects.find((s) => s.id === selRow.user) : undefined;

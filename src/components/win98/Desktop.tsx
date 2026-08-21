@@ -61,6 +61,7 @@ export function Desktop() {
   const activeId = useActiveWindowId();
 
   const phase = useGameStore((s) => s.phase);
+  const currentCaseId = useGameStore((s) => s.currentCaseId);
   const resetGame = useGameStore((s) => s.reset);
   const offerCase = useGameStore((s) => s.offerCase);
 
@@ -85,6 +86,13 @@ export function Desktop() {
       setGuideVisible(true);
     }
   }, []);
+
+  // Each new case gets a fresh chance to show its own closed report. Without
+  // this, dismissing Case 001's report leaves reportDismissed=true, and a
+  // later Case 002 solve would skip the report entirely.
+  useEffect(() => {
+    setReportDismissed(false);
+  }, [currentCaseId]);
 
   // Play intro theme while the guide is up; stop on dismiss or mute.
   useEffect(() => {
