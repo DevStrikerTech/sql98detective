@@ -68,7 +68,7 @@ export function CaseFilesApp({ onRequest }: { onRequest: (what: string) => void 
   const brokenCount = suspects.filter(
     (s) => !!s.contradictedBy && discovered.includes(s.contradictedBy),
   ).length;
-  const heat = caseHeat[Math.min(discovered.length, caseHeat.length - 1)];
+  const heat = caseHeat[Math.min(discovered.length, caseHeat.length - 1)] ?? caseHeat[0]!;
 
   const tabs: [Tab, string][] = [
     ["dossier", "Dossier"],
