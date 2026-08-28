@@ -1,3 +1,7 @@
+# SQL 98: Digital Detective
+
+![app demo](https://github.com/DevStrikerTech/sql98detective/blob/main/public/short_demo.gif?raw=true)
+
 Based on an analysis of the repository name sql98detective and the developer profile of DevStrikerTech, this project is an interactive SQL-based mystery game. It is likely inspired by "The SQL Murder Mystery," designed to teach SQL querying skills (like JOIN, WHERE, and subqueries) through a narrative detective story, potentially set in 1998 (suggested by the "98" in the title).
 Project Analysis
 Purpose: An educational tool or portfolio piece that challenges users to solve a crime by investigating a database.
@@ -17,18 +21,14 @@ Professionalism: It makes the repository look like a production-ready data proje
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/DevStrikerTech/sql98detective.git
-   cd sql98detective
-   ```[[1](https://www.google.com/url?sa=E&q=https%3A%2F%2Fgithub.com%2FDevStrikerTech%2Fsql98detective)]
 
 2. **Install dependencies:**
    ```bash
    npm install
-   ```[[1](https://www.google.com/url?sa=E&q=https%3A%2F%2Fgithub.com%2FDevStrikerTech%2Fsql98detective)]
 
 3. **Start the development server:**
    ```bash
    npm run dev
-   ```[[1](https://www.google.com/url?sa=E&q=https%3A%2F%2Fgithub.com%2FDevStrikerTech%2Fsql98detective)]
 
 ### Useful checks:
 
