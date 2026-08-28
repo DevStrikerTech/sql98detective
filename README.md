@@ -1,37 +1,46 @@
 # SQL 98: Digital Detective
 
-![app demo](https://github.com/DevStrikerTech/sql98detective/blob/main/public/short_demo.gif?raw=true)
+![app demo](https://github.com/DevStrikerTech/sql98detective/blob/main/public/audio/demo.gif?raw=true)
 
-Based on an analysis of the repository name sql98detective and the developer profile of DevStrikerTech, this project is an interactive SQL-based mystery game. It is likely inspired by "The SQL Murder Mystery," designed to teach SQL querying skills (like JOIN, WHERE, and subqueries) through a narrative detective story, potentially set in 1998 (suggested by the "98" in the title).
-Project Analysis
-Purpose: An educational tool or portfolio piece that challenges users to solve a crime by investigating a database.
-Likely Components: A SQLite/SQL database file containing "police reports," "witnesses," "interviews," and "drivers_licenses," along with a README.md that serves as the starting point for the investigation.
-Target Audience: SQL beginners, students, or recruiters looking to evaluate a candidate's data manipulation skills.
-Strengths: Gamified learning is highly engaging and provides a clear "win state" for the learner.
-Suggested Improvement to README.md
-Suggestion: Add a Mermaid.js Entity-Relationship Diagram (ERD)
-While the mystery prompt provides the story, users often get stuck because they cannot "see" the database structure. Adding a visual schema diagram directly in the README.md using GitHub's native Mermaid.js support is a small change with a high impact on usability.
-Why this is useful:
-Reduces Friction: Users won't have to run PRAGMA table_info() or DESCRIBE commands for every table just to find foreign keys.
-Improves Learning: It teaches users how to visualize relationships before writing complex JOIN statements.
-Professionalism: It makes the repository look like a production-ready data project.
+Boot the machine, read your precinct inbox, open case files, inspect suspicious logs and use SQL.exe to turn messy office gossip into proof. The goal is to feel like an investigation game first and an SQL-learning toy second: SQL is the detective tool, not the whole personality.
+
+## Play The Pitch
+
+You are the precinct's digital detective. Chief Brannigan keeps sending tiny office disasters to your inbox, and every disaster leaves a trail somewhere in the machine.
+
+The current build includes:
+
+- A draggable Windows 98-inspired desktop shell with Start menu, taskbar, dialogs and fake apps.
+- Case 001: `THE MISSING SPREADSHEET`, a filesystem-and-log investigation about a vanished payroll file.
+- Case 002: `THE PHANTOM PRINT JOB`, a lean lead-board case about an unclaimed printer incident.
+- A fake SQL console that accepts small SELECT queries against in-game records.
+- Case files, evidence stamps, clue progression, inbox follow-ups, retro audio cues and a first-run guide.
+
+## Why This Exists
+
+SQL exercises are usually presented like homework. This project wraps the same core skill in mystery, comedy and atmosphere: the player learns that a query is a way to ask a better question.
+
+The design target is late-90s office software: chunky windows, tiny icons, over-serious dialogs, suspicious printers and the emotional weight of a missing `.xls` file.
+
+## Tech Snapshot
+
+- React
+- TypeScript
+- TanStack Start / Router
+- Zustand
+- Tailwind CSS
+- Vite
 
 ## Run Locally
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/DevStrikerTech/sql98detective.git
+```sh
+npm install
+npm run dev
+```
 
-2. **Install dependencies:**
-   ```bash
-   npm install
+Useful checks:
 
-3. **Start the development server:**
-   ```bash
-   npm run dev
-
-### Useful checks:
-
-```bash
+```sh
 npm run lint
 npm run build
+```
