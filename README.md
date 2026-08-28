@@ -33,14 +33,24 @@ The design target is late-90s office software: chunky windows, tiny icons, over-
 
 ## Run Locally
 
-```sh
-npm install
-npm run dev
-```
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/DevStrikerTech/sql98detective.git
+   cd sql98detective
+   ```[[1](https://www.google.com/url?sa=E&q=https%3A%2F%2Fgithub.com%2FDevStrikerTech%2Fsql98detective)]
 
-Useful checks:
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```[[1](https://www.google.com/url?sa=E&q=https%3A%2F%2Fgithub.com%2FDevStrikerTech%2Fsql98detective)]
 
-```sh
+3. **Start the development server:**
+   ```bash
+   npm run dev
+   ```[[1](https://www.google.com/url?sa=E&q=https%3A%2F%2Fgithub.com%2FDevStrikerTech%2Fsql98detective)]
+
+### Useful checks:
+
+```bash
 npm run lint
 npm run build
-```
