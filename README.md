@@ -4,7 +4,7 @@
 
 Boot the machine, read your precinct inbox, open case files, inspect suspicious logs and use SQL.exe to turn messy office gossip into proof. The goal is to feel like an investigation game first and an SQL-learning toy second: SQL is the detective tool, not the whole personality.
 
-## Play The Pitch
+## Play the Pitch
 
 You are the precinct's digital detective. Chief Brannigan keeps sending tiny office disasters to your inbox, and every disaster leaves a trail somewhere in the machine.
 
