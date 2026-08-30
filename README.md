@@ -36,6 +36,7 @@ The design target is late-90s office software: chunky windows, tiny icons, over-
 ```sh
 npm install
 npm run dev
+After starting the dev server, open the local URL shown in the terminal.
 ```
 
 Useful checks:
