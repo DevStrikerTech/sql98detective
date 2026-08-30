@@ -31,11 +31,26 @@ The design target is late-90s office software: chunky windows, tiny icons, over-
 - Tailwind CSS
 - Vite
 
+## Prerequisites
+
+Make sure you have the following installed:
+
+- Node.js 18+
+- npm 9+
+
 ## Run Locally
 
+Clone the repository and install the dependencies:
+
+
 ```sh
+git clone https://github.com/DevStrikerTech/sql98detective.git cd sql98detective
+
 npm install
+
+Start the development server:
 npm run dev
+
 After starting the dev server, open the local URL shown in the terminal.
 ```
 
