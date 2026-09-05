@@ -40,8 +40,14 @@ Make sure you have the following installed:
 
 ## Run Locally
 
-1. Clone the repository and navigate into the project directory:
+```sh
+npm install
+npm run dev
+```
+
+Useful checks:
 
 ```sh
-git clone [https://github.com/DevStrikerTech/sql98detective.git](https://github.com/DevStrikerTech/sql98detective.git)
-cd sql98detective
+npm run lint
+npm run build
+```
